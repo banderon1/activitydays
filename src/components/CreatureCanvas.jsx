@@ -294,45 +294,148 @@ function CreatureCanvas({ creature, size = 300 }) {
     ctx.fillStyle = '#333'
     ctx.lineWidth = 3
 
-    switch (creature.mouthType) {
+    // Determine mouth type from props or direct type
+    const mouthProps = creature.mouthProps || {}
+    const mouthType = mouthProps.type || (creature.mouthType ? creature.mouthType.split('_')[1] || 'smile' : 'smile')
+
+    switch (mouthType) {
+      // --- BASIC ---
       case 'smile':
-        ctx.beginPath()
-        ctx.arc(0, 0, 20, 0, Math.PI)
-        ctx.stroke()
+        ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI); ctx.stroke();
         break
+      case 'frown':
+        ctx.beginPath(); ctx.arc(0, 20, 20, Math.PI, 0); ctx.stroke();
+        break
+      case 'neutral':
+        ctx.beginPath(); ctx.moveTo(-20, 10); ctx.lineTo(20, 10); ctx.stroke();
+        break
+      case 'open':
+        ctx.beginPath(); ctx.arc(0, 10, 10, 0, Math.PI * 2); ctx.stroke();
+        break
+      case 'tongue':
+        ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI); ctx.stroke(); // Smile
+        ctx.fillStyle = '#ff9999';
+        ctx.beginPath(); ctx.moveTo(-5, 20); ctx.quadraticCurveTo(0, 35, 5, 20); ctx.fill(); ctx.stroke();
+        break
+
+      // --- ANIMAL ---
+      case 'cat':
+        ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(-10, 10); ctx.quadraticCurveTo(-20, 10, -25, 5); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(5, 0); ctx.lineTo(10, 10); ctx.quadraticCurveTo(20, 10, 25, 5); ctx.stroke();
+        break
+      case 'dog':
+        ctx.beginPath(); ctx.moveTo(-20, 5); ctx.quadraticCurveTo(0, 25, 20, 5); ctx.stroke(); // Open mouth
+        ctx.fillStyle = '#ff9999'; // Tongue
+        ctx.beginPath(); ctx.ellipse(5, 20, 8, 12, Math.PI / 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        break
+      case 'beak':
+        ctx.fillStyle = '#ffcc00';
+        ctx.beginPath(); ctx.moveTo(-10, -5); ctx.lineTo(10, -5); ctx.lineTo(0, 15); ctx.fill(); ctx.stroke();
+        break
+      case 'rabbit':
+        ctx.beginPath(); ctx.moveTo(-5, 5); ctx.lineTo(-10, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(5, 5); ctx.lineTo(10, 10); ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(-5, 10, 5, 10); ctx.strokeRect(-5, 10, 5, 10);
+        ctx.fillRect(0, 10, 5, 10); ctx.strokeRect(0, 10, 5, 10);
+        break
+      case 'snout':
+        ctx.fillStyle = '#ffcccc';
+        ctx.beginPath(); ctx.ellipse(0, 0, 15, 10, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(-5, 0, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(5, 0, 3, 0, Math.PI * 2); ctx.fill();
+        break
+
+      // --- MONSTER ---
       case 'fangs':
-        ctx.beginPath()
-        ctx.moveTo(-15, 0)
-        ctx.lineTo(15, 0)
-        ctx.stroke()
+        // Mouth line
+        ctx.beginPath(); ctx.moveTo(-20, 5); ctx.lineTo(20, 5); ctx.stroke();
         // Fangs
-        ctx.fillStyle = '#fff'
-        ctx.beginPath()
-        ctx.moveTo(-10, 0)
-        ctx.lineTo(-8, 15)
-        ctx.lineTo(-6, 0)
-        ctx.fill()
-        ctx.stroke()
-        ctx.beginPath()
-        ctx.moveTo(10, 0)
-        ctx.lineTo(8, 15)
-        ctx.lineTo(6, 0)
-        ctx.fill()
-        ctx.stroke()
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.moveTo(-15, 5); ctx.lineTo(-10, 20); ctx.lineTo(-5, 5); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(15, 5); ctx.lineTo(10, 20); ctx.lineTo(5, 5); ctx.fill(); ctx.stroke();
         break
-      case 'straight':
-        ctx.beginPath()
-        ctx.moveTo(-15, 0)
-        ctx.lineTo(15, 0)
-        ctx.stroke()
+      case 'tusks':
+        // Bottom tusks
+        ctx.fillStyle = '#fffef0';
+        ctx.beginPath(); ctx.moveTo(-20, 15); ctx.quadraticCurveTo(-25, -10, -35, -20); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(20, 15); ctx.quadraticCurveTo(25, -10, 35, -20); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-15, 10); ctx.lineTo(15, 10); ctx.stroke();
         break
-      case 'roar':
-        ctx.fillStyle = '#000'
-        ctx.beginPath()
-        ctx.ellipse(0, 5, 15, 20, 0, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
+      case 'toothy': // Shark
+        ctx.fillStyle = '#000'; // Open mouth
+        ctx.beginPath(); ctx.arc(0, 10, 25, 0, Math.PI, false); ctx.fill();
+        ctx.fillStyle = '#fff'; // Sharp teeth
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath(); ctx.moveTo(-20 + i * 10, 10); ctx.lineTo(-15 + i * 10, 30); ctx.lineTo(-10 + i * 10, 10); ctx.fill();
+        }
         break
+      case 'leech':
+        ctx.beginPath(); ctx.arc(0, 10, 15, 0, Math.PI * 2); ctx.stroke();
+        // Circular teeth
+        ctx.fillStyle = '#fff';
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          ctx.beginPath(); ctx.arc(Math.cos(angle) * 10, 10 + Math.sin(angle) * 10, 3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        }
+        break
+      case 'gaping':
+        ctx.fillStyle = '#110000';
+        ctx.beginPath(); ctx.ellipse(0, 15, 25, 35, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        break
+
+      // --- TECH ---
+      case 'speaker':
+        ctx.fillStyle = '#444';
+        for (let i = 0; i < 3; i++) {
+          ctx.fillRect(-20 + i * 15, 0, 10, 20);
+        }
+        break
+      case 'vent':
+        ctx.fillStyle = '#666';
+        ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(20, 0); ctx.lineTo(15, 20); ctx.lineTo(-15, 20); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#000';
+        ctx.fillRect(-10, 5, 20, 2);
+        ctx.fillRect(-8, 10, 16, 2);
+        ctx.fillRect(-6, 15, 12, 2);
+        break
+      case 'stitch':
+        ctx.beginPath(); ctx.moveTo(-30, 10); ctx.lineTo(30, 10); ctx.stroke();
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath(); ctx.moveTo(-20 + i * 10, 0); ctx.lineTo(-20 + i * 10, 20); ctx.stroke();
+        }
+        break
+      case 'zipper':
+        ctx.fillStyle = '#333';
+        ctx.fillRect(-30, 8, 60, 4);
+        ctx.fillStyle = '#888';
+        for (let i = 0; i < 10; i++) {
+          ctx.fillRect(-30 + i * 6, 5, 2, 10);
+        }
+        ctx.fillStyle = '#aaa'; // Pull tab
+        ctx.fillRect(30, 8, 5, 15);
+        break
+      case 'void':
+        ctx.fillStyle = '#000';
+        ctx.shadowColor = '#000'; ctx.shadowBlur = 10;
+        ctx.beginPath(); ctx.arc(0, 10, 15, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+        break
+      case 'mustache':
+        ctx.fillStyle = '#333'; // Handlebar
+        ctx.beginPath();
+        ctx.moveTo(0, 5);
+        ctx.quadraticCurveTo(15, -5, 30, 10);
+        ctx.quadraticCurveTo(15, 5, 0, 5);
+        ctx.moveTo(0, 5);
+        ctx.quadraticCurveTo(-15, -5, -30, 10);
+        ctx.quadraticCurveTo(-15, 5, 0, 5);
+        ctx.fill();
+        break
+
+      default:
+        ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI); ctx.stroke();
     }
 
     ctx.restore()

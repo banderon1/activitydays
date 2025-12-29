@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import CreatureCanvas from './CreatureCanvas'
-import { bodyTypes, eyeTypes, colors } from '../data/creatureData'
+import { bodyTypes, eyeTypes, colors, mouthTypes } from '../data/creatureData'
 import './CreatureBuilder.css'
 
 // Keep others for now as they are not yet data-driven
 // const colors = [...] - Now imported
 // const eyeTypes = [...] - Now imported
-const mouthTypes = ['smile', 'fangs', 'straight', 'roar']
+// const mouthTypes = [...] - Now imported
 const armTypes = ['none', 'small', 'long', 'claws']
 const legTypes = ['none', 'stumpy', 'tall', 'wheels']
 const accessoryTypes = ['none', 'horns', 'antenna', 'spikes', 'crown']
@@ -17,7 +17,7 @@ function CreatureBuilder({ onSave }) {
     bodyType: bodyTypes[0].id, // Default to first body
     color: colors[0].id,
     eyeType: eyeTypes[0].id,
-    mouthType: 'smile',
+    mouthType: mouthTypes[0].id,
     armType: 'small',
     legType: 'stumpy',
     accessory: 'none',
@@ -58,6 +58,14 @@ function CreatureBuilder({ onSave }) {
       defense += currentColor.stats.defense || 0
     }
 
+    // Mouth affects stats
+    const currentMouth = mouthTypes.find(m => m.id === creature.mouthType)
+    if (currentMouth) {
+      strength += currentMouth.stats.strength || 0
+      speed += currentMouth.stats.speed || 0
+      defense += currentMouth.stats.defense || 0
+    }
+
     // Arms affect strength
     if (creature.armType === 'claws') strength += 4
     if (creature.armType === 'long') strength += 2
@@ -81,7 +89,7 @@ function CreatureBuilder({ onSave }) {
       defense,
       health: 100
     }))
-  }, [creature.bodyType, creature.eyeType, creature.color, creature.armType, creature.legType, creature.accessory])
+  }, [creature.bodyType, creature.eyeType, creature.color, creature.mouthType, creature.armType, creature.legType, creature.accessory])
 
   const updateCreature = (key, value) => {
     setCreature(prev => ({ ...prev, [key]: value }))
@@ -99,6 +107,7 @@ function CreatureBuilder({ onSave }) {
     const currentBody = bodyTypes.find(b => b.id === creature.bodyType)
     const currentEye = eyeTypes.find(e => e.id === creature.eyeType)
     const currentColor = colors.find(c => c.id === creature.color)
+    const currentMouth = mouthTypes.find(m => m.id === creature.mouthType)
 
     onSave({
       ...creature,
@@ -115,6 +124,9 @@ function CreatureBuilder({ onSave }) {
       eyeProps: currentEye ? {
         type: currentEye.type,
         count: currentEye.count
+      } : {},
+      mouthProps: currentMouth ? {
+        type: currentMouth.type
       } : {}
     })
 
@@ -124,7 +136,7 @@ function CreatureBuilder({ onSave }) {
       bodyType: bodyTypes[0].id,
       color: colors[0].id,
       eyeType: eyeTypes[0].id,
-      mouthType: 'smile',
+      mouthType: mouthTypes[0].id,
       armType: 'small',
       legType: 'stumpy',
       accessory: 'none',
@@ -142,7 +154,7 @@ function CreatureBuilder({ onSave }) {
       bodyType: randomBody.id,
       color: colors[Math.floor(Math.random() * colors.length)].id,
       eyeType: eyeTypes[Math.floor(Math.random() * eyeTypes.length)].id,
-      mouthType: mouthTypes[Math.floor(Math.random() * mouthTypes.length)],
+      mouthType: mouthTypes[Math.floor(Math.random() * mouthTypes.length)].id,
       armType: armTypes[Math.floor(Math.random() * armTypes.length)],
       legType: legTypes[Math.floor(Math.random() * legTypes.length)],
       accessory: accessoryTypes[Math.floor(Math.random() * accessoryTypes.length)]
@@ -167,6 +179,9 @@ function CreatureBuilder({ onSave }) {
     eyeProps: {
       type: currentEyeData.type,
       count: currentEyeData.count
+    },
+    mouthProps: {
+      type: (mouthTypes.find(m => m.id === creature.mouthType) || mouthTypes[0]).type
     }
   }
 
@@ -270,18 +285,18 @@ function CreatureBuilder({ onSave }) {
         </div>
 
         <div className="control-group">
-          <label>Mouth:</label>
-          <div className="button-group">
+          <label>Mouth ({mouthTypes.length} Options):</label>
+          <select
+            value={creature.mouthType}
+            onChange={(e) => updateCreature('mouthType', e.target.value)}
+            className="body-selector"
+          >
             {mouthTypes.map(type => (
-              <button
-                key={type}
-                className={creature.mouthType === type ? 'selected' : ''}
-                onClick={() => updateCreature('mouthType', type)}
-              >
-                {type}
-              </button>
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
         <div className="control-group">

@@ -197,3 +197,52 @@ export const generateColors = () => {
 }
 
 export const colors = generateColors()
+
+export const generateMouthTypes = () => {
+    const types = []
+
+    // 1. Basic Mouths (Neutral/Balanced)
+    const basicMouths = [
+        { id: 'mouth_smile', name: 'Happy Smile', type: 'smile', stats: { speed: 2, strength: 1, defense: 2 } },
+        { id: 'mouth_frown', name: 'Sad Frown', type: 'frown', stats: { defense: 3, strength: 1, speed: 1 } },
+        { id: 'mouth_neutral', name: 'Stoic Line', type: 'neutral', stats: { defense: 4, strength: 1, speed: 0 } },
+        { id: 'mouth_open', name: 'Surprised O', type: 'open', stats: { speed: 3, defense: 1, strength: 1 } },
+        { id: 'mouth_tongue', name: 'Silly Tongue', type: 'tongue', stats: { speed: 4, strength: 1, defense: 0 } },
+    ]
+    types.push(...basicMouths)
+
+    // 2. Animal/Nature (Speed/Defense)
+    const animalMouths = [
+        { id: 'mouth_cat', name: 'Kitty :3', type: 'cat', stats: { speed: 5, defense: 0, strength: 0 } },
+        { id: 'mouth_dog', name: 'Puppy Pant', type: 'dog', stats: { speed: 4, strength: 1, defense: 0 } },
+        { id: 'mouth_beak', name: 'Sharp Beak', type: 'beak', stats: { speed: 5, strength: 2, defense: -2 } },
+        { id: 'mouth_rabbit', name: 'Buck Teeth', type: 'rabbit', stats: { speed: 4, defense: 2, strength: -1 } },
+        { id: 'mouth_snout', name: 'Pig Snout', type: 'snout', stats: { defense: 4, strength: 2, speed: -1 } },
+    ]
+    types.push(...animalMouths)
+
+    // 3. Monster/Aggressive (Strength)
+    const monsterMouths = [
+        { id: 'mouth_fangs', name: 'Vampire Fangs', type: 'fangs', stats: { strength: 5, speed: 2, defense: -2 } },
+        { id: 'mouth_tusks', name: 'Orc Tusks', type: 'tusks', stats: { strength: 6, defense: 2, speed: -3 } },
+        { id: 'mouth_shark', name: 'Shark Teeth', type: 'toothy', stats: { strength: 7, speed: 1, defense: -3 } },
+        { id: 'mouth_leech', name: 'Leech Sucker', type: 'leech', stats: { strength: 5, defense: 3, speed: -3 } },
+        { id: 'mouth_gaping', name: 'Gaping Maw', type: 'gaping', stats: { strength: 8, defense: 0, speed: -3 } },
+    ]
+    types.push(...monsterMouths)
+
+    // 4. Tech/Weird (Special)
+    const techMouths = [
+        { id: 'mouth_speaker', name: 'Speaker Grill', type: 'speaker', stats: { defense: 5, strength: 0, speed: 0 } },
+        { id: 'mouth_vent', name: 'Exhaust Vent', type: 'vent', stats: { speed: 5, defense: 2, strength: -2 } },
+        { id: 'mouth_stitch', name: 'Stitched Shut', type: 'stitch', stats: { defense: 8, speed: -2, strength: -1 } },
+        { id: 'mouth_zipper', name: 'Zipper', type: 'zipper', stats: { defense: 6, speed: -1, strength: 0 } },
+        { id: 'mouth_void', name: 'Dark Void', type: 'void', stats: { strength: 4, defense: 4, speed: -3 } },
+        { id: 'mouth_mustache', name: 'Gentleman', type: 'mustache', stats: { defense: 3, strength: 2, speed: 0 } }
+    ]
+    types.push(...techMouths)
+
+    return types
+}
+
+export const mouthTypes = generateMouthTypes()
