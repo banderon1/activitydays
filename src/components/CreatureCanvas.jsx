@@ -60,152 +60,103 @@ function CreatureCanvas({ creature, size = 300 }) {
     ctx.save()
     ctx.translate(150, 150)
 
-    // Default to 'circle' if no bodyProps (fallback)
     const bodyProps = creature.bodyProps || {}
-    const type = bodyProps.type || creature.bodyType.split('_')[0] || 'round' // Fallback for old saves
+    const type = bodyProps.type || 'hero' // Default
 
     switch (type) {
-      case 'circle': // basic_round falls here
-      case 'round':
+      // 1. HERO TORSO
+      case 'hero':
+        // Trapezoid torso
         ctx.beginPath()
-        ctx.arc(0, 0, 60, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
-        break
-      case 'square':
-        ctx.fillRect(-60, -60, 120, 120)
-        ctx.strokeRect(-60, -60, 120, 120)
-        break
-      case 'triangle':
-        ctx.beginPath()
-        ctx.moveTo(0, -70)
-        ctx.lineTo(-60, 50)
-        ctx.lineTo(60, 50)
+        ctx.moveTo(-50, -40) // Shoulder L
+        ctx.lineTo(50, -40)  // Shoulder R
+        ctx.lineTo(30, 40)   // Waist R
+        ctx.lineTo(0, 50)    // Crotch
+        ctx.lineTo(-30, 40)  // Waist L
         ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-        break
-      case 'blob':
-        ctx.beginPath()
-        ctx.ellipse(0, 0, 70, 50, 0, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
+        ctx.fill(); ctx.stroke()
+        // Pecs detail
+        ctx.beginPath(); ctx.moveTo(-30, -10); ctx.quadraticCurveTo(0, 10, 30, -10); ctx.stroke()
         break
 
-      // Parametric Star
-      case 'star':
+      // 2. MECH CHASSIS
+      case 'mech':
+        ctx.fillStyle = '#b3b3b3'; // Industrial Grey override (or keep user color? Let's use user color but darken)
+        ctx.fillStyle = creature.color;
+        // Hexagonal Chest
         ctx.beginPath()
-        const points = bodyProps.points || 5
-        // Outer radius 80, inner radius depends on 'spikiness' usually but 35 is good default
-        const outerRadius = 80
-        const innerRadius = 35
-        for (let i = 0; i < points; i++) {
-          const angleOuter = (18 + i * (360 / points)) * Math.PI / 180
-          const angleInner = (18 + (i + 0.5) * (360 / points)) * Math.PI / 180 // half step set
-
-          // Actually standard star logic
-          ctx.lineTo(Math.cos(angleOuter) * outerRadius, -Math.sin(angleOuter) * outerRadius)
-          ctx.lineTo(Math.cos(angleInner) * innerRadius, -Math.sin(angleInner) * innerRadius)
-        }
+        ctx.moveTo(-40, -50); ctx.lineTo(40, -50)
+        ctx.lineTo(60, -10); ctx.lineTo(40, 50)
+        ctx.lineTo(-40, 50); ctx.lineTo(-60, -10)
         ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
+        ctx.fill(); ctx.stroke()
+        // Vents
+        ctx.fillStyle = '#333';
+        ctx.fillRect(-20, 10, 40, 5)
+        ctx.fillRect(-20, 20, 40, 5)
         break
 
-      // Parametric Polygon
-      case 'polygon':
+      // 3. BEAST BODY (Quadruped)
+      case 'beast':
+        // Horizontal Oval
         ctx.beginPath()
-        const sides = bodyProps.sides || 6
-        const radius = 70
-        for (let i = 0; i < sides; i++) {
-          const angle = (i * (360 / sides)) * Math.PI / 180
-          ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
-        }
+        ctx.ellipse(0, 10, 60, 40, 0, 0, Math.PI * 2)
+        ctx.fill(); ctx.stroke()
+        // Flank muscle
+        ctx.beginPath(); ctx.arc(-30, 10, 20, 0, Math.PI, true); ctx.stroke();
+        break
+
+      // 4. INSECT THORAX
+      case 'insect':
+        // Segmented
+        ctx.beginPath(); ctx.ellipse(0, -20, 40, 30, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke() // Upper
+        ctx.beginPath(); ctx.ellipse(0, 30, 35, 40, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke() // Abdomen
+        break
+
+      // 5. SLIME CORE
+      case 'slime':
+        ctx.beginPath()
+        ctx.moveTo(-40, -30)
+        ctx.bezierCurveTo(-60, -10, -50, 50, 0, 60)
+        ctx.bezierCurveTo(50, 50, 60, -10, 40, -30)
+        ctx.quadraticCurveTo(0, -50, -40, -30)
+        ctx.fill(); ctx.stroke()
+        // Bubbles inside
+        ctx.fillStyle = 'rgba(255,255,255,0.3)'
+        ctx.beginPath(); ctx.arc(-20, 0, 5, 0, Math.PI * 2); ctx.fill()
+        ctx.beginPath(); ctx.arc(20, 20, 8, 0, Math.PI * 2); ctx.fill()
+        break
+
+      // 6. GEODE (Rock)
+      case 'geode':
+        ctx.beginPath()
+        ctx.moveTo(-40, -50); ctx.lineTo(30, -60)
+        ctx.lineTo(60, -10); ctx.lineTo(40, 60)
+        ctx.lineTo(-30, 50); ctx.lineTo(-60, 0)
         ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
+        ctx.fill(); ctx.stroke()
+        // Crystal center
+        ctx.fillStyle = '#bdf';
+        ctx.beginPath(); ctx.moveTo(-10, -10); ctx.lineTo(10, 10); ctx.lineTo(20, -5); ctx.fill();
         break
 
-      // Parametric Rock
-      case 'rock':
-        // Seed-based jagged look would be ideal, but for now we use roughness to add variation
-        // Since we don't have a stable random seed per creature in this view without re-generating on each render,
-        // we will use a deterministic approach based on roughness + index
+      // 7. NOVA CORE (Star)
+      case 'nova':
         ctx.beginPath()
-        const roughness = bodyProps.roughness || 1
-        const rockRadius = 70
-        const rockPoints = 8 + roughness // More points for detailed rocks
-
-        for (let i = 0; i < rockPoints; i++) {
-          const angle = (i * (360 / rockPoints)) * Math.PI / 180
-          // Create some deterministic variance
-          const variance = Math.sin(i * 3 + roughness) * (roughness * 4)
-          const r = rockRadius + variance
+        for (let i = 0; i < 8; i++) {
+          const angle = (i * 45) * Math.PI / 180
+          const r = i % 2 === 0 ? 60 : 30
           ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r)
         }
         ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-        // Cracks
-        if (roughness > 3) {
-          ctx.moveTo(-10, -10)
-          ctx.lineTo(10, 10)
-          ctx.lineTo(20 + roughness, 5)
-          ctx.stroke()
-        }
+        ctx.fill(); ctx.stroke()
         break
 
-      // Parametric Cloud
-      case 'cloud':
-        // Fluffiness determines number of puffs
-        const fluffiness = bodyProps.fluffiness || 5
-        const puffCount = 5 + Math.ceil(fluffiness / 2)
-
-        // Draw central mass
+      default:
+        // Fallback Circle
         ctx.beginPath()
-        ctx.arc(0, 0, 40, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Draw surrounding puffs
-        for (let i = 0; i < puffCount; i++) {
-          const angle = (i * (360 / puffCount)) * Math.PI / 180
-          const d = 40 // distance from center
-          const puffSize = 25 + (i % 2) * 10 // alternate size
-
-          const px = Math.cos(angle) * d
-          const py = Math.sin(angle) * d
-
-          ctx.beginPath()
-          ctx.arc(px, py, puffSize, 0, Math.PI * 2)
-          ctx.fill()
-          ctx.stroke()
-        }
-        // Redraw center to cover inner strokes if needed? 
-        // Actually clouds usually look better merged. 
-        // To merge properly in 2D canvas without composite operations is tricky for outline.
-        // Simplified: Draw all filled circles first, then stroke the whole path?
-        // Or just let them overlap. The current implementation draws strokes inside which looks messy.
-        // Improved Cloud:
-        ctx.fillStyle = creature.color
-        // We need a path describing the union for the stroke. 
-        // For simplicity in this quick refactor, we just draw overlapping filled circles 
-        // but that leaves internal strokes if we stroke each one.
-        // Let's rely on just drawing them all. 
-        break
-
-      case 'ghost':
-        ctx.beginPath()
-        ctx.arc(0, -20, 60, Math.PI, 0)
-        ctx.lineTo(60, 60)
-        // Wavy bottom
-        for (let i = 1; i <= 6; i++) {
-          ctx.lineTo(60 - (20 * i), (i % 2 == 0) ? 60 : 50)
-        }
-        ctx.lineTo(-60, 60)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-        break
+        ctx.arc(0, 0, 50, 0, Math.PI * 2)
+        ctx.fill(); ctx.stroke()
     }
 
     ctx.restore()
@@ -213,7 +164,9 @@ function CreatureCanvas({ creature, size = 300 }) {
 
   const drawEyes = (ctx, creature) => {
     ctx.save()
-    ctx.translate(150, 140)
+    // Use Face Anchor if available, else default
+    const anchor = creature.bodyProps?.anchors?.face || { x: 0, y: -10 }
+    ctx.translate(150 + anchor.x, 150 + anchor.y)
 
     // Determine eye render type and props
     const eyeProps = creature.eyeProps || {}
@@ -298,7 +251,9 @@ function CreatureCanvas({ creature, size = 300 }) {
 
   const drawMouth = (ctx, creature) => {
     ctx.save()
-    ctx.translate(150, 165)
+    // Use Face Anchor, then offset down slightly for mouth
+    const anchor = creature.bodyProps?.anchors?.face || { x: 0, y: -10 }
+    ctx.translate(150 + anchor.x, 150 + anchor.y + 25)
     ctx.strokeStyle = '#333'
     ctx.fillStyle = '#333'
     ctx.lineWidth = 3
@@ -452,7 +407,13 @@ function CreatureCanvas({ creature, size = 300 }) {
 
   const drawArms = (ctx, creature) => {
     ctx.save()
+    // Base translate to center, then we use anchors relative to 0,0
     ctx.translate(150, 150)
+
+    // Anchors
+    const anchors = creature.bodyProps?.anchors || { armL: { x: -50, y: 0 }, armR: { x: 50, y: 0 } }
+    const { armL, armR } = anchors
+
     ctx.strokeStyle = creature.color
     ctx.fillStyle = creature.color
     ctx.lineWidth = 10
@@ -467,9 +428,9 @@ function CreatureCanvas({ creature, size = 300 }) {
         break
       case 'small': // Stick
         // Left
-        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-70, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(armL.x, armL.y); ctx.lineTo(armL.x - 20, armL.y + 10); ctx.stroke();
         // Right
-        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(70, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(armR.x, armR.y); ctx.lineTo(armR.x + 20, armR.y + 10); ctx.stroke();
         break
       case 'noodle': // Wavy
         // Left
@@ -486,18 +447,18 @@ function CreatureCanvas({ creature, size = 300 }) {
       case 'fat':
         ctx.lineWidth = 20;
         // Left
-        ctx.beginPath(); ctx.moveTo(-45, 0); ctx.lineTo(-75, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(armL.x, armL.y); ctx.lineTo(armL.x - 30, armL.y + 10); ctx.stroke();
         // Right
-        ctx.beginPath(); ctx.moveTo(45, 0); ctx.lineTo(75, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(armR.x, armR.y); ctx.lineTo(armR.x + 30, armR.y + 10); ctx.stroke();
         break
 
       // --- MUSCLE ---
       case 'muscle': // Brawny
         ctx.lineWidth = 15;
         // Left flex
-        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-80, -20); ctx.lineTo(-90, -50); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(armL.x, armL.y); ctx.lineTo(armL.x - 30, armL.y - 20); ctx.lineTo(armL.x - 40, armL.y - 50); ctx.stroke();
         // Right flex
-        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(80, -20); ctx.lineTo(90, -50); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(armR.x, armR.y); ctx.lineTo(armR.x + 30, armR.y - 20); ctx.lineTo(armR.x + 40, armR.y - 50); ctx.stroke();
         break
       case 'ripped': // Veiny/Angular
         ctx.lineWidth = 12;
@@ -515,12 +476,12 @@ function CreatureCanvas({ creature, size = 300 }) {
       case 'gloves': // Boxer
         ctx.lineWidth = 10;
         // Arms
-        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-80, 10); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(80, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(armL.x, armL.y); ctx.lineTo(armL.x - 30, armL.y + 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(armR.x, armR.y); ctx.lineTo(armR.x + 30, armR.y + 10); ctx.stroke();
         // Gloves
         ctx.fillStyle = '#ff0000';
-        ctx.beginPath(); ctx.arc(-85, 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.arc(85, 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(armL.x - 35, armL.y + 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(armR.x + 35, armR.y + 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         break
       case 'knuckles':
         ctx.lineWidth = 10;
@@ -665,7 +626,13 @@ function CreatureCanvas({ creature, size = 300 }) {
 
   const drawLegs = (ctx, creature) => {
     ctx.save()
-    ctx.translate(150, 210)
+    // Legs drawn relative to center, using anchor offsets
+    ctx.translate(150, 150)
+
+    // Anchors
+    const anchors = creature.bodyProps?.anchors || { legL: { x: -30, y: 60 }, legR: { x: 30, y: 60 } }
+    const { legL, legR } = anchors
+
     ctx.strokeStyle = creature.color
     ctx.fillStyle = creature.color
     ctx.lineWidth = 10
@@ -680,16 +647,16 @@ function CreatureCanvas({ creature, size = 300 }) {
         break
       case 'stumpy':
         // Left
-        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-30, 20); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legL.x, legL.y); ctx.lineTo(legL.x, legL.y + 20); ctx.stroke();
         // Right
-        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(30, 20); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legR.x, legR.y); ctx.lineTo(legR.x, legR.y + 20); ctx.stroke();
         break
       case 'human':
         ctx.lineWidth = 12;
         // Left
-        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-30, 60); ctx.lineTo(-40, 60); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legL.x, legL.y); ctx.lineTo(legL.x, legL.y + 60); ctx.lineTo(legL.x - 10, legL.y + 60); ctx.stroke();
         // Right
-        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(30, 60); ctx.lineTo(40, 60); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legR.x, legR.y); ctx.lineTo(legR.x, legR.y + 60); ctx.lineTo(legR.x + 10, legR.y + 60); ctx.stroke();
         break
       case 'stick':
         ctx.lineWidth = 4;
@@ -706,9 +673,9 @@ function CreatureCanvas({ creature, size = 300 }) {
       case 'cat':
         ctx.lineWidth = 10;
         // Left
-        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.quadraticCurveTo(-40, 20, -35, 40); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legL.x, legL.y); ctx.quadraticCurveTo(legL.x - 10, legL.y + 20, legL.x - 5, legL.y + 40); ctx.stroke();
         // Right
-        ctx.beginPath(); ctx.moveTo(30, 0); ctx.quadraticCurveTo(40, 20, 35, 40); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legR.x, legR.y); ctx.quadraticCurveTo(legR.x + 10, legR.y + 20, legR.x + 5, legR.y + 40); ctx.stroke();
         break
       case 'cheetah':
         ctx.lineWidth = 8;
@@ -730,12 +697,12 @@ function CreatureCanvas({ creature, size = 300 }) {
       case 'wheels':
         ctx.fillStyle = '#333'; ctx.strokeStyle = '#333';
         // Left
-        ctx.beginPath(); ctx.arc(-30, 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = '#aaa'; ctx.beginPath(); ctx.arc(-30, 15, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(legL.x, legL.y + 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#aaa'; ctx.beginPath(); ctx.arc(legL.x, legL.y + 15, 5, 0, Math.PI * 2); ctx.fill();
         // Right
         ctx.fillStyle = '#333';
-        ctx.beginPath(); ctx.arc(30, 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = '#aaa'; ctx.beginPath(); ctx.arc(30, 15, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(legR.x, legR.y + 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#aaa'; ctx.beginPath(); ctx.arc(legR.x, legR.y + 15, 5, 0, Math.PI * 2); ctx.fill();
         break
       case 'springs':
         ctx.strokeStyle = '#999'; ctx.lineWidth = 3;

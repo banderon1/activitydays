@@ -198,7 +198,8 @@ function CreatureBuilder({ onSave }) {
       points: currentBodyData.points,
       sides: currentBodyData.sides,
       roughness: currentBodyData.roughness,
-      fluffiness: currentBodyData.fluffiness
+      fluffiness: currentBodyData.fluffiness,
+      anchors: currentBodyData.anchors // Pass explicit anchors
     },
     eyeProps: {
       type: currentEyeData.type,

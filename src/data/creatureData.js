@@ -1,115 +1,141 @@
 export const generateBodyTypes = () => {
     const types = []
 
-    // Basic Shapes (Water/Balanced)
-    const basicShapes = ['round', 'square', 'triangle', 'blob']
-    const basicNames = {
-        'round': 'Circle',
-        'square': 'Block',
-        'triangle': 'Wedge',
-        'blob': 'Slime'
-    }
-    basicShapes.forEach((shape) => {
-        types.push({
-            id: `basic_${shape}`,
-            name: basicNames[shape],
-            type: shape,
-            element: 'water',
-            stats: { speed: 5, strength: 5, defense: 5 }
-        })
+    // 1. HERO TORSO (Balanced/Water)
+    // Tapered waist, broad shoulders
+    types.push({
+        id: 'body_hero',
+        name: 'Hero Torso',
+        type: 'hero',
+        element: 'water',
+        stats: { speed: 5, strength: 5, defense: 5 },
+        anchors: {
+            face: { x: 0, y: -30 },
+            armL: { x: -40, y: -25 }, // Shoulder L
+            armR: { x: 40, y: -25 },  // Shoulder R
+            legL: { x: -20, y: 50 },  // Hip L
+            legR: { x: 20, y: 50 },   // Hip R
+            accBack: { x: 0, y: -10 }
+        }
     })
 
-    // Stars (Fire/Fast but Fragile)
-    // 3-12 points
-    const starPrefixes = {
-        3: 'Tri', 4: 'Quad', 5: 'Penta', 6: 'Hexa',
-        7: 'Hepta', 8: 'Octa', 9: 'Nona', 10: 'Deca',
-        11: 'Hendeca', 12: 'Dodeca'
-    }
-    for (let i = 3; i <= 12; i++) {
-        types.push({
-            id: `star_${i}`,
-            name: `${starPrefixes[i]}star`,
-            type: 'star',
-            element: 'fire',
-            points: i,
-            stats: {
-                speed: 6 + Math.floor(i / 2),
-                strength: 4 + Math.floor(i / 3),
-                defense: 3 - Math.floor(i / 4) // Trade-off: Lower defense
-            }
-        })
-    }
+    // 2. MECH CHASSIS (Tech/Strong/Slow)
+    // Boxy, angular, industrial
+    types.push({
+        id: 'body_mech',
+        name: 'Mech Chassis',
+        type: 'mech',
+        element: 'tech',
+        stats: { speed: 3, strength: 7, defense: 6 },
+        anchors: {
+            face: { x: 0, y: -20 },
+            armL: { x: -50, y: -20 }, // Wide mount
+            armR: { x: 50, y: -20 },
+            legL: { x: -35, y: 45 },  // Wide stance
+            legR: { x: 35, y: 45 },
+            accBack: { x: 0, y: 0 }
+        }
+    })
 
-    // Polygons (Tech/Strong but Slow)
-    // 3-12 sides
-    const polyNames = {
-        3: 'Triangle', 4: 'Square', 5: 'Pentagon', 6: 'Hexagon',
-        7: 'Heptagon', 8: 'Octagon', 9: 'Nonagon', 10: 'Decagon',
-        11: 'Hendecagon', 12: 'Dodecagon'
-    }
-    for (let i = 3; i <= 12; i++) {
-        types.push({
-            id: `poly_${i}`,
-            name: polyNames[i] || `Polygon-${i}`,
-            type: 'polygon',
-            element: 'tech',
-            sides: i,
-            stats: {
-                defense: 5 + Math.floor(i / 2),
-                strength: 6 + Math.floor(i / 4),
-                speed: 4 - Math.floor(i / 3) // Trade-off: Slower
-            }
-        })
-    }
+    // 3. BEAST BODY (Nature/Fast/Fragile)
+    // Horizontal alignment (Quadruped style)
+    types.push({
+        id: 'body_beast',
+        name: 'Beast Body',
+        type: 'beast',
+        element: 'nature',
+        stats: { speed: 8, strength: 4, defense: 3 },
+        anchors: {
+            face: { x: -50, y: -20 }, // Head forward
+            armL: { x: -40, y: 30 },  // Front Leg L (Arms act as front legs)
+            armR: { x: -40, y: 30 },  // Front Leg R (Visual trick or offset?)
+            // Actually, for quadrupeds, arms usually map to front legs.
+            // Let's widen them for 2D side view or front view? 
+            // Let's assume Front View for now:
+            armL: { x: -45, y: 20 },
+            armR: { x: 45, y: 20 },
+            legL: { x: -30, y: 40 }, // Back legs
+            legR: { x: 30, y: 40 },
+            accBack: { x: 0, y: -20 }
+        }
+    })
 
-    // Rocks (Nature/Tank but Very Slow)
-    // 1-10 roughness
-    // Map roughness to creative names
-    const rockNames = [
-        'Smooth Stone', 'Pebble', 'Cobble', 'Rock',
-        'Boulder', 'Crag', 'Shard', 'Spire',
-        'Monolith', 'Mountain'
-    ]
-    for (let i = 1; i <= 10; i++) {
-        types.push({
-            id: `rock_${i}`,
-            name: rockNames[i - 1],
-            type: 'rock',
-            element: 'nature',
-            roughness: i,
-            stats: {
-                defense: 8 + Math.floor(i / 2),
-                speed: 2 - Math.floor(i / 3), // Trade-off: Very slow
-                strength: 6
-            }
-        })
-    }
+    // 4. INSECT THORAX (Fire/Defense/Slow)
+    // Round but segmented
+    types.push({
+        id: 'body_insect',
+        name: 'Insect Thorax',
+        type: 'insect',
+        element: 'fire',
+        stats: { speed: 4, strength: 6, defense: 6 },
+        anchors: {
+            face: { x: 0, y: -35 },
+            armL: { x: -35, y: -10 }, // Mid-body
+            armR: { x: 35, y: -10 },
+            legL: { x: -25, y: 40 },
+            legR: { x: 25, y: 40 },
+            accBack: { x: 0, y: -10 }
+        }
+    })
 
-    // Clouds (Air -> Water/Fast but Weak)
-    // 1-10 fluffiness
-    const cloudNames = [
-        'Wisp', 'Mist', 'Puff', 'Vapor',
-        'Cloud', 'Cumulus', 'Stratus', 'Nimbus',
-        'Storm', 'Hurricane'
-    ]
-    for (let i = 1; i <= 10; i++) {
-        types.push({
-            id: `cloud_${i}`,
-            name: cloudNames[i - 1],
-            type: 'cloud',
-            element: 'water', // Using Water for "Air/Cloud" for now
-            fluffiness: i,
-            stats: {
-                speed: 8 + Math.floor(i / 3),
-                defense: 3 + Math.floor(i / 4), // Trade-off: Low defense
-                strength: 3 // Trade-off: Low strength
-            }
-        })
-    }
+    // 5. SLIME CORE (Water/Balanced/Weird)
+    // Blobby
+    types.push({
+        id: 'body_slime',
+        name: 'Slime Core',
+        type: 'slime',
+        element: 'water',
+        stats: { speed: 5, strength: 4, defense: 7 },
+        anchors: {
+            face: { x: 0, y: 0 }, // Center face
+            armL: { x: -45, y: 10 },
+            armR: { x: 45, y: 10 },
+            legL: { x: -20, y: 50 },
+            legR: { x: 20, y: 50 },
+            accBack: { x: 0, y: 0 }
+        }
+    })
+
+    // 6. GEODE (Nature/Tank)
+    // Rock style
+    types.push({
+        id: 'body_geode',
+        name: 'Living Geode',
+        type: 'geode',
+        element: 'nature',
+        stats: { speed: 2, strength: 8, defense: 8 },
+        anchors: {
+            face: { x: 0, y: -20 },
+            armL: { x: -55, y: 0 },
+            armR: { x: 55, y: 0 },
+            legL: { x: -30, y: 55 },
+            legR: { x: 30, y: 55 },
+            accBack: { x: 0, y: -30 }
+        }
+    })
+
+    // 7. STAR CORE (Fire/Fast)
+    // Pointy
+    types.push({
+        id: 'body_star',
+        name: 'Nova Core',
+        type: 'nova',
+        element: 'fire',
+        stats: { speed: 9, strength: 5, defense: 2 },
+        anchors: {
+            face: { x: 0, y: 0 },
+            armL: { x: -30, y: 0 },
+            armR: { x: 30, y: 0 },
+            legL: { x: -20, y: 40 },
+            legR: { x: 20, y: 40 },
+            accBack: { x: 0, y: 0 }
+        }
+    })
 
     return types
 }
+
+
 
 export const bodyTypes = generateBodyTypes()
 
