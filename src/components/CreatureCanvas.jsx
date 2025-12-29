@@ -448,64 +448,207 @@ function CreatureCanvas({ creature, size = 300 }) {
     ctx.fillStyle = creature.color
     ctx.lineWidth = 10
 
-    switch (creature.armType) {
-      case 'small':
-        // Left arm
-        ctx.beginPath()
-        ctx.moveTo(-50, 0)
-        ctx.lineTo(-70, 10)
-        ctx.stroke()
-        // Right arm
-        ctx.beginPath()
-        ctx.moveTo(50, 0)
-        ctx.lineTo(70, 10)
-        ctx.stroke()
+    // Determine arm type from props or direct type
+    const armProps = creature.armProps || {}
+    const armType = armProps.type || (creature.armType ? creature.armType.split('_')[1] || 'small' : 'small')
+
+    switch (armType) {
+      // --- BASIC ---
+      case 'none':
+        break
+      case 'small': // Stick
+        // Left
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-70, 10); ctx.stroke();
+        // Right
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(70, 10); ctx.stroke();
+        break
+      case 'noodle': // Wavy
+        // Left
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.quadraticCurveTo(-60, -20, -80, 0); ctx.stroke();
+        // Right
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.quadraticCurveTo(60, -20, 80, 0); ctx.stroke();
         break
       case 'long':
-        // Left arm
-        ctx.beginPath()
-        ctx.moveTo(-50, -10)
-        ctx.lineTo(-90, 20)
-        ctx.stroke()
-        // Right arm
-        ctx.beginPath()
-        ctx.moveTo(50, -10)
-        ctx.lineTo(90, 20)
-        ctx.stroke()
+        // Left
+        ctx.beginPath(); ctx.moveTo(-50, -10); ctx.lineTo(-100, 30); ctx.stroke();
+        // Right
+        ctx.beginPath(); ctx.moveTo(50, -10); ctx.lineTo(100, 30); ctx.stroke();
+        break
+      case 'fat':
+        ctx.lineWidth = 20;
+        // Left
+        ctx.beginPath(); ctx.moveTo(-45, 0); ctx.lineTo(-75, 10); ctx.stroke();
+        // Right
+        ctx.beginPath(); ctx.moveTo(45, 0); ctx.lineTo(75, 10); ctx.stroke();
+        break
+
+      // --- MUSCLE ---
+      case 'muscle': // Brawny
+        ctx.lineWidth = 15;
+        // Left flex
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-80, -20); ctx.lineTo(-90, -50); ctx.stroke();
+        // Right flex
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(80, -20); ctx.lineTo(90, -50); ctx.stroke();
+        break
+      case 'ripped': // Veiny/Angular
+        ctx.lineWidth = 12;
+        // Left
+        ctx.beginPath(); ctx.moveTo(-50, 10); ctx.lineTo(-80, 0); ctx.lineTo(-100, 10); ctx.stroke();
+        // Right
+        ctx.beginPath(); ctx.moveTo(50, 10); ctx.lineTo(80, 0); ctx.lineTo(100, 10); ctx.stroke();
+        break
+      case 'hulk': // Massive
+        ctx.lineWidth = 25;
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(-50, 10); ctx.lineTo(-100, 30); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(50, 10); ctx.lineTo(100, 30); ctx.stroke();
+        break
+      case 'gloves': // Boxer
+        ctx.lineWidth = 10;
+        // Arms
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-80, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(80, 10); ctx.stroke();
+        // Gloves
+        ctx.fillStyle = '#ff0000';
+        ctx.beginPath(); ctx.arc(-85, 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(85, 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        break
+      case 'knuckles':
+        ctx.lineWidth = 10;
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-80, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(80, 10); ctx.stroke();
+        // Brass
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(-90, 5, 10, 20); ctx.strokeRect(-90, 5, 10, 20);
+        ctx.fillRect(80, 5, 10, 20); ctx.strokeRect(80, 5, 10, 20);
+        break
+
+      // --- MONSTER ---
+      case 'tentacle':
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        // Wavy tentacles
+        ctx.beginPath(); ctx.moveTo(-50, 10); ctx.bezierCurveTo(-70, 40, -90, -20, -110, 20); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(50, 10); ctx.bezierCurveTo(70, 40, 90, -20, 110, 20); ctx.stroke();
         break
       case 'claws':
         ctx.lineWidth = 8
         // Left arm
-        ctx.beginPath()
-        ctx.moveTo(-50, 0)
-        ctx.lineTo(-80, 15)
-        ctx.stroke()
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-80, 15); ctx.stroke();
         // Left claws
-        ctx.strokeStyle = '#333'
-        ctx.lineWidth = 3
-        for (let i = 0; i < 3; i++) {
-          ctx.beginPath()
-          ctx.moveTo(-80, 15)
-          ctx.lineTo(-85 - i * 5, 25)
-          ctx.stroke()
-        }
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 3
+        for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(-80, 15); ctx.lineTo(-85 - i * 5, 25); ctx.stroke(); }
         // Right arm
-        ctx.strokeStyle = creature.color
-        ctx.lineWidth = 8
-        ctx.beginPath()
-        ctx.moveTo(50, 0)
-        ctx.lineTo(80, 15)
-        ctx.stroke()
+        ctx.strokeStyle = creature.color; ctx.lineWidth = 8
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(80, 15); ctx.stroke();
         // Right claws
-        ctx.strokeStyle = '#333'
-        ctx.lineWidth = 3
-        for (let i = 0; i < 3; i++) {
-          ctx.beginPath()
-          ctx.moveTo(80, 15)
-          ctx.lineTo(85 + i * 5, 25)
-          ctx.stroke()
-        }
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 3
+        for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(80, 15); ctx.lineTo(85 + i * 5, 25); ctx.stroke(); }
         break
+      case 'wings':
+        ctx.fillStyle = creature.color; // Same as body but maybe translucent?
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+        // Left Wing
+        ctx.beginPath(); ctx.moveTo(-50, -20); ctx.lineTo(-120, -60); ctx.lineTo(-100, 20); ctx.lineTo(-80, 10); ctx.lineTo(-70, 30); ctx.lineTo(-50, 10); ctx.fill(); ctx.stroke();
+        // Right Wing
+        ctx.beginPath(); ctx.moveTo(50, -20); ctx.lineTo(120, -60); ctx.lineTo(100, 20); ctx.lineTo(80, 10); ctx.lineTo(70, 30); ctx.lineTo(50, 10); ctx.fill(); ctx.stroke();
+        break
+      case 'fins':
+        ctx.fillStyle = creature.color;
+        // Left Fin
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.quadraticCurveTo(-90, -10, -80, 40); ctx.quadraticCurveTo(-60, 20, -50, 20); ctx.fill(); ctx.stroke();
+        // Right Fin
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.quadraticCurveTo(90, -10, 80, 40); ctx.quadraticCurveTo(60, 20, 50, 20); ctx.fill(); ctx.stroke();
+        break
+      case 'vines':
+        ctx.strokeStyle = '#2ECC40'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(-40, 0); ctx.bezierCurveTo(-60, 30, -80, -10, -100, 40); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(40, 0); ctx.bezierCurveTo(60, 30, 80, -10, 100, 40); ctx.stroke();
+        // Thorns
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.moveTo(-70, 10); ctx.lineTo(-80, 0); ctx.lineTo(-65, 0); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(70, 10); ctx.lineTo(80, 0); ctx.lineTo(65, 0); ctx.fill();
+        break
+      case 'slug':
+        ctx.fillStyle = 'rgba(255,255,255,0.5)'; // Slime trail visual?
+        // Just stubby slime arms
+        ctx.lineWidth = 12; ctx.lineCap = 'round';
+        ctx.strokeStyle = creature.color;
+        ctx.beginPath(); ctx.moveTo(-50, 20); ctx.lineTo(-70, 40); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(50, 20); ctx.lineTo(70, 40); ctx.stroke();
+        break
+
+      // --- TECH ---
+      case 'robot':
+        ctx.strokeStyle = '#999'; ctx.lineWidth = 12;
+        // Joints
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-70, 0); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(70, 0); ctx.stroke();
+        ctx.fillStyle = '#555';
+        ctx.beginPath(); ctx.arc(-70, 0, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(70, 0, 8, 0, Math.PI * 2); ctx.fill();
+        // Forearms
+        ctx.strokeStyle = '#999';
+        ctx.beginPath(); ctx.moveTo(-70, 0); ctx.lineTo(-90, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(70, 0); ctx.lineTo(90, 10); ctx.stroke();
+        // Clamps
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 4;
+        ctx.strokeRect(-100, 5, 10, 10); ctx.strokeRect(90, 5, 10, 10);
+        break
+      case 'drill':
+        ctx.fillStyle = '#aaa';
+        // Left Drill
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-70, -10); ctx.lineTo(-110, 10); ctx.lineTo(-70, 30); ctx.fill(); ctx.stroke();
+        // Right Drill
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(70, -10); ctx.lineTo(110, 10); ctx.lineTo(70, 30); ctx.fill(); ctx.stroke();
+        break
+      case 'magnet':
+        ctx.fillStyle = '#f00'; ctx.strokeStyle = '#ccc'; ctx.lineWidth = 2;
+        // Magnet U shape
+        const drawMagnet = (x, sign) => {
+          ctx.save(); ctx.translate(x, 0); ctx.scale(sign, 1);
+          ctx.fillRect(0, -15, 20, 10); ctx.strokeRect(0, -15, 20, 10); // Top
+          ctx.fillRect(0, 15, 20, 10); ctx.strokeRect(0, 15, 20, 10); // Bottom
+          ctx.fillStyle = '#ccc';
+          ctx.fillRect(20, -15, 10, 40); ctx.strokeRect(20, -15, 10, 40); // Base
+          ctx.restore();
+        }
+        drawMagnet(-80, 1);
+        drawMagnet(80, -1);
+        break
+      case 'shield':
+        ctx.fillStyle = '#0074D9'; ctx.strokeStyle = '#fff';
+        // Arms holding shields
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-70, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(70, 10); ctx.stroke();
+        // Shields
+        ctx.beginPath(); ctx.arc(-80, 10, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(80, 10, 25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        break
+      case 'cannon':
+        ctx.fillStyle = '#111';
+        // Left Cannon
+        ctx.beginPath(); ctx.rect(-100, -10, 50, 30); ctx.fill();
+        // Right Cannon
+        ctx.beginPath(); ctx.rect(50, -10, 50, 30); ctx.fill();
+        break
+      case 'saw':
+        ctx.fillStyle = '#ddd'; ctx.strokeStyle = '#888';
+        // Arms
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-70, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(70, 10); ctx.stroke();
+        // Saws
+        const drawSaw = (x) => {
+          ctx.beginPath(); ctx.arc(x, 15, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.arc(x, 15, 5, 0, Math.PI * 2); ctx.stroke();
+        }
+        drawSaw(-85); drawSaw(85);
+        break
+
+      default:
+        // Basic small arms
+        ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(-70, 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(50, 0); ctx.lineTo(70, 10); ctx.stroke();
     }
 
     ctx.restore()

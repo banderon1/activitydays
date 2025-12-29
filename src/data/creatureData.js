@@ -246,3 +246,53 @@ export const generateMouthTypes = () => {
 }
 
 export const mouthTypes = generateMouthTypes()
+
+export const generateArmTypes = () => {
+    const types = []
+
+    // 1. Basic Arms (Balanced)
+    const basicArms = [
+        { id: 'arm_none', name: 'No Arms', type: 'none', stats: { speed: 2, strength: 0, defense: 0 } },
+        { id: 'arm_start', name: 'Stick Arms', type: 'small', stats: { strength: 1, defense: 0, speed: 0 } },
+        { id: 'arm_noodle', name: 'Noodle Arms', type: 'noodle', stats: { strength: 1, speed: 1, defense: 0 } },
+        { id: 'arm_long', name: 'Long Reach', type: 'long', stats: { strength: 2, defense: 1, speed: -1 } },
+        { id: 'arm_fat', name: 'Chubby Arms', type: 'fat', stats: { defense: 2, strength: 2, speed: -1 } },
+    ]
+    types.push(...basicArms)
+
+    // 2. Muscle/Strength (Strength Focus)
+    const muscleArms = [
+        { id: 'arm_brawny', name: 'Brawny', type: 'muscle', stats: { strength: 5, defense: 2, speed: -2 } },
+        { id: 'arm_ripped', name: 'Ripped', type: 'ripped', stats: { strength: 6, defense: 1, speed: -1 } },
+        { id: 'arm_hulk', name: 'Hulking', type: 'hulk', stats: { strength: 8, defense: 3, speed: -4 } },
+        { id: 'arm_boxer', name: 'Boxer Gloves', type: 'gloves', stats: { strength: 4, defense: 4, speed: 0 } },
+        { id: 'arm_knuckles', name: 'Brass Knuckles', type: 'knuckles', stats: { strength: 5, speed: 1, defense: 0 } },
+    ]
+    types.push(...muscleArms)
+
+    // 3. Monster/Nature (Speed/Special)
+    const monsterArms = [
+        { id: 'arm_tentacle', name: 'Tentacles', type: 'tentacle', stats: { speed: 3, strength: 2, defense: 1 } },
+        { id: 'arm_claws', name: 'Sharp Claws', type: 'claws', stats: { strength: 5, speed: 2, defense: -1 } },
+        { id: 'arm_wings', name: 'Bat Wings', type: 'wings', stats: { speed: 6, defense: 1, strength: 0 } },
+        { id: 'arm_fins', name: 'Shark Fins', type: 'fins', stats: { speed: 5, strength: 2, defense: 1 } },
+        { id: 'arm_vines', name: 'Thorn Vines', type: 'vines', stats: { defense: 4, strength: 1, speed: 1 } },
+        { id: 'arm_slug', name: 'Slime Trails', type: 'slug', stats: { defense: 5, speed: -2, strength: 1 } },
+    ]
+    types.push(...monsterArms)
+
+    // 4. Tech/Utility (Defense/Utility)
+    const techArms = [
+        { id: 'arm_robot', name: 'Robot Arms', type: 'robot', stats: { strength: 4, defense: 3, speed: -1 } },
+        { id: 'arm_drill', name: 'Drill Hands', type: 'drill', stats: { strength: 7, defense: 1, speed: -2 } },
+        { id: 'arm_magnet', name: 'Magnets', type: 'magnet', stats: { defense: 4, speed: 1, strength: 1 } },
+        { id: 'arm_shield', name: 'Shields', type: 'shield', stats: { defense: 8, strength: 1, speed: -3 } },
+        { id: 'arm_cannon', name: 'Arm Cannons', type: 'cannon', stats: { strength: 6, speed: -1, defense: 2 } },
+        { id: 'arm_saw', name: 'Buzzsaws', type: 'saw', stats: { strength: 7, speed: 1, defense: -2 } }
+    ]
+    types.push(...techArms)
+
+    return types
+}
+
+export const armTypes = generateArmTypes()
