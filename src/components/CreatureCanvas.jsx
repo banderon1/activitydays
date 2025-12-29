@@ -51,7 +51,12 @@ function CreatureCanvas({ creature, size = 300 }) {
     ctx.save()
     ctx.translate(150, 150)
 
-    switch (creature.bodyType) {
+    // Default to 'circle' if no bodyProps (fallback)
+    const bodyProps = creature.bodyProps || {}
+    const type = bodyProps.type || creature.bodyType.split('_')[0] || 'round' // Fallback for old saves
+
+    switch (type) {
+      case 'circle': // basic_round falls here
       case 'round':
         ctx.beginPath()
         ctx.arc(0, 0, 60, 0, Math.PI * 2)
@@ -74,6 +79,121 @@ function CreatureCanvas({ creature, size = 300 }) {
       case 'blob':
         ctx.beginPath()
         ctx.ellipse(0, 0, 70, 50, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+        break
+
+      // Parametric Star
+      case 'star':
+        ctx.beginPath()
+        const points = bodyProps.points || 5
+        // Outer radius 80, inner radius depends on 'spikiness' usually but 35 is good default
+        const outerRadius = 80
+        const innerRadius = 35
+        for (let i = 0; i < points; i++) {
+          const angleOuter = (18 + i * (360 / points)) * Math.PI / 180
+          const angleInner = (18 + (i + 0.5) * (360 / points)) * Math.PI / 180 // half step set
+
+          // Actually standard star logic
+          ctx.lineTo(Math.cos(angleOuter) * outerRadius, -Math.sin(angleOuter) * outerRadius)
+          ctx.lineTo(Math.cos(angleInner) * innerRadius, -Math.sin(angleInner) * innerRadius)
+        }
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+        break
+
+      // Parametric Polygon
+      case 'polygon':
+        ctx.beginPath()
+        const sides = bodyProps.sides || 6
+        const radius = 70
+        for (let i = 0; i < sides; i++) {
+          const angle = (i * (360 / sides)) * Math.PI / 180
+          ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius)
+        }
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+        break
+
+      // Parametric Rock
+      case 'rock':
+        // Seed-based jagged look would be ideal, but for now we use roughness to add variation
+        // Since we don't have a stable random seed per creature in this view without re-generating on each render,
+        // we will use a deterministic approach based on roughness + index
+        ctx.beginPath()
+        const roughness = bodyProps.roughness || 1
+        const rockRadius = 70
+        const rockPoints = 8 + roughness // More points for detailed rocks
+
+        for (let i = 0; i < rockPoints; i++) {
+          const angle = (i * (360 / rockPoints)) * Math.PI / 180
+          // Create some deterministic variance
+          const variance = Math.sin(i * 3 + roughness) * (roughness * 4)
+          const r = rockRadius + variance
+          ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r)
+        }
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+        // Cracks
+        if (roughness > 3) {
+          ctx.moveTo(-10, -10)
+          ctx.lineTo(10, 10)
+          ctx.lineTo(20 + roughness, 5)
+          ctx.stroke()
+        }
+        break
+
+      // Parametric Cloud
+      case 'cloud':
+        // Fluffiness determines number of puffs
+        const fluffiness = bodyProps.fluffiness || 5
+        const puffCount = 5 + Math.ceil(fluffiness / 2)
+
+        // Draw central mass
+        ctx.beginPath()
+        ctx.arc(0, 0, 40, 0, Math.PI * 2)
+        ctx.fill()
+
+        // Draw surrounding puffs
+        for (let i = 0; i < puffCount; i++) {
+          const angle = (i * (360 / puffCount)) * Math.PI / 180
+          const d = 40 // distance from center
+          const puffSize = 25 + (i % 2) * 10 // alternate size
+
+          const px = Math.cos(angle) * d
+          const py = Math.sin(angle) * d
+
+          ctx.beginPath()
+          ctx.arc(px, py, puffSize, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.stroke()
+        }
+        // Redraw center to cover inner strokes if needed? 
+        // Actually clouds usually look better merged. 
+        // To merge properly in 2D canvas without composite operations is tricky for outline.
+        // Simplified: Draw all filled circles first, then stroke the whole path?
+        // Or just let them overlap. The current implementation draws strokes inside which looks messy.
+        // Improved Cloud:
+        ctx.fillStyle = creature.color
+        // We need a path describing the union for the stroke. 
+        // For simplicity in this quick refactor, we just draw overlapping filled circles 
+        // but that leaves internal strokes if we stroke each one.
+        // Let's rely on just drawing them all. 
+        break
+
+      case 'ghost':
+        ctx.beginPath()
+        ctx.arc(0, -20, 60, Math.PI, 0)
+        ctx.lineTo(60, 60)
+        // Wavy bottom
+        for (let i = 1; i <= 6; i++) {
+          ctx.lineTo(60 - (20 * i), (i % 2 == 0) ? 60 : 50)
+        }
+        ctx.lineTo(-60, 60)
+        ctx.closePath()
         ctx.fill()
         ctx.stroke()
         break

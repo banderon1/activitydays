@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import CreatureCanvas from './CreatureCanvas'
+import { bodyTypes } from '../data/creatureData'
 import './CreatureBuilder.css'
 
-const bodyTypes = ['round', 'square', 'triangle', 'blob']
+// Keep others for now as they are not yet data-driven, or we can move them too later
 const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2']
 const eyeTypes = ['dots', 'angry', 'googly', 'laser']
 const mouthTypes = ['smile', 'fangs', 'straight', 'roar']
@@ -13,14 +14,14 @@ const accessoryTypes = ['none', 'horns', 'antenna', 'spikes', 'crown']
 function CreatureBuilder({ onSave }) {
   const [creature, setCreature] = useState({
     name: '',
-    bodyType: 'round',
+    bodyType: bodyTypes[0].id, // Default to first body
     color: colors[0],
     eyeType: 'dots',
     mouthType: 'smile',
     armType: 'small',
     legType: 'stumpy',
     accessory: 'none',
-    // Stats based on parts
+    // Base Stats
     strength: 5,
     speed: 5,
     defense: 5,
@@ -33,11 +34,13 @@ function CreatureBuilder({ onSave }) {
     let speed = 5
     let defense = 5
 
-    // Body type affects defense
-    if (creature.bodyType === 'square') defense += 3
-    if (creature.bodyType === 'round') defense += 2
-    if (creature.bodyType === 'triangle') speed += 2
-    if (creature.bodyType === 'blob') defense += 1
+    // Body type affects stats (from data)
+    const currentBody = bodyTypes.find(b => b.id === creature.bodyType)
+    if (currentBody) {
+      strength = currentBody.stats.strength
+      speed = currentBody.stats.speed
+      defense = currentBody.stats.defense
+    }
 
     // Arms affect strength
     if (creature.armType === 'claws') strength += 4
@@ -73,11 +76,28 @@ function CreatureBuilder({ onSave }) {
       alert('Please give your creature a name!')
       return
     }
-    onSave(creature)
+    // Need to pass the full body object so Canvas knows how to draw it later if we just saved ID
+    // Actually, Canvas in Battle will need to know. 
+    // For now, let's just save the state. The BattleArena will need to lookup the body by ID or we save the specialized props.
+    // Let's attach special body props to the saved object.
+    const currentBody = bodyTypes.find(b => b.id === creature.bodyType)
+
+    onSave({
+      ...creature,
+      // Clone specific body rendering props so we don't depend on looking up data later if we don't want to
+      bodyProps: {
+        type: currentBody.type,
+        points: currentBody.points,
+        sides: currentBody.sides,
+        roughness: currentBody.roughness,
+        fluffiness: currentBody.fluffiness
+      }
+    })
+
     // Reset to create new creature
     setCreature({
       name: '',
-      bodyType: 'round',
+      bodyType: bodyTypes[0].id,
       color: colors[0],
       eyeType: 'dots',
       mouthType: 'smile',
@@ -92,9 +112,10 @@ function CreatureBuilder({ onSave }) {
   }
 
   const randomize = () => {
+    const randomBody = bodyTypes[Math.floor(Math.random() * bodyTypes.length)]
     setCreature(prev => ({
       ...prev,
-      bodyType: bodyTypes[Math.floor(Math.random() * bodyTypes.length)],
+      bodyType: randomBody.id,
       color: colors[Math.floor(Math.random() * colors.length)],
       eyeType: eyeTypes[Math.floor(Math.random() * eyeTypes.length)],
       mouthType: mouthTypes[Math.floor(Math.random() * mouthTypes.length)],
@@ -104,11 +125,24 @@ function CreatureBuilder({ onSave }) {
     }))
   }
 
+  // Find current body for passing to Canvas preview
+  const currentBodyData = bodyTypes.find(b => b.id === creature.bodyType) || bodyTypes[0]
+  const creatureForCanvas = {
+    ...creature,
+    bodyProps: {
+      type: currentBodyData.type,
+      points: currentBodyData.points,
+      sides: currentBodyData.sides,
+      roughness: currentBodyData.roughness,
+      fluffiness: currentBodyData.fluffiness
+    }
+  }
+
   return (
     <div className="creature-builder">
       <div className="builder-left">
         <div className="canvas-container">
-          <CreatureCanvas creature={creature} />
+          <CreatureCanvas creature={creatureForCanvas} />
         </div>
 
         <div className="stats-panel">
@@ -116,21 +150,21 @@ function CreatureBuilder({ onSave }) {
           <div className="stat">
             <span>💪 Strength:</span>
             <div className="stat-bar">
-              <div className="stat-fill" style={{ width: `${creature.strength * 5}%` }}></div>
+              <div className="stat-fill" style={{ width: `${Math.min(100, creature.strength * 5)}%` }}></div>
             </div>
             <span>{creature.strength}</span>
           </div>
           <div className="stat">
             <span>⚡ Speed:</span>
             <div className="stat-bar">
-              <div className="stat-fill" style={{ width: `${creature.speed * 5}%` }}></div>
+              <div className="stat-fill" style={{ width: `${Math.min(100, creature.speed * 5)}%` }}></div>
             </div>
             <span>{creature.speed}</span>
           </div>
           <div className="stat">
             <span>🛡️ Defense:</span>
             <div className="stat-bar">
-              <div className="stat-fill" style={{ width: `${creature.defense * 5}%` }}></div>
+              <div className="stat-fill" style={{ width: `${Math.min(100, creature.defense * 5)}%` }}></div>
             </div>
             <span>{creature.defense}</span>
           </div>
@@ -159,18 +193,18 @@ function CreatureBuilder({ onSave }) {
         </div>
 
         <div className="control-group">
-          <label>Body Type:</label>
-          <div className="button-group">
+          <label>Body Type ({bodyTypes.length} Options):</label>
+          <select
+            value={creature.bodyType}
+            onChange={(e) => updateCreature('bodyType', e.target.value)}
+            className="body-selector"
+          >
             {bodyTypes.map(type => (
-              <button
-                key={type}
-                className={creature.bodyType === type ? 'selected' : ''}
-                onClick={() => updateCreature('bodyType', type)}
-              >
-                {type}
-              </button>
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
         <div className="control-group">
