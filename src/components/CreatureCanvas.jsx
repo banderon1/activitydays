@@ -206,95 +206,82 @@ function CreatureCanvas({ creature, size = 300 }) {
     ctx.save()
     ctx.translate(150, 140)
 
-    switch (creature.eyeType) {
+    // Determine eye render type and props
+    const eyeProps = creature.eyeProps || {}
+    const eyeType = eyeProps.type || (creature.eyeType ? creature.eyeType.split('_')[1] || creature.eyeType.split('_')[0] : 'dots')
+    const eyeCount = eyeProps.count || 2
+
+    switch (eyeType) {
+      // --- BASIC ---
       case 'dots':
-        ctx.fillStyle = '#fff'
-        ctx.strokeStyle = '#333'
-        ctx.lineWidth = 2
-        // Left eye
-        ctx.beginPath()
-        ctx.arc(-20, 0, 10, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
-        // Right eye
-        ctx.beginPath()
-        ctx.arc(20, 0, 10, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
-        // Pupils
-        ctx.fillStyle = '#333'
-        ctx.beginPath()
-        ctx.arc(-20, 0, 5, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.beginPath()
-        ctx.arc(20, 0, 5, 0, Math.PI * 2)
-        ctx.fill()
+        drawStandardEyes(ctx, 10, '#333')
         break
+      case 'anime':
+        drawAnimeEyes(ctx)
+        break
+      case 'big':
+        drawStandardEyes(ctx, 15, '#333', true) // Big with glint
+        break
+      case 'small':
+        drawStandardEyes(ctx, 5, '#333')
+        break
+
+      // --- EMOTIONS ---
       case 'angry':
-        ctx.strokeStyle = '#333'
-        ctx.lineWidth = 4
-        // Angry eyebrows
-        ctx.beginPath()
-        ctx.moveTo(-35, -10)
-        ctx.lineTo(-15, -5)
-        ctx.stroke()
-        ctx.beginPath()
-        ctx.moveTo(35, -10)
-        ctx.lineTo(15, -5)
-        ctx.stroke()
-        // Eyes
-        ctx.fillStyle = '#ff0000'
-        ctx.beginPath()
-        ctx.arc(-20, 5, 8, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.beginPath()
-        ctx.arc(20, 5, 8, 0, Math.PI * 2)
-        ctx.fill()
+        drawAngryEyes(ctx)
         break
-      case 'googly':
-        ctx.fillStyle = '#fff'
-        ctx.strokeStyle = '#333'
-        ctx.lineWidth = 2
-        // Left eye
-        ctx.beginPath()
-        ctx.arc(-20, 0, 12, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
-        // Right eye
-        ctx.beginPath()
-        ctx.arc(20, 0, 12, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
-        // Pupils (offset for googly effect)
-        ctx.fillStyle = '#333'
-        ctx.beginPath()
-        ctx.arc(-18, 3, 6, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.beginPath()
-        ctx.arc(22, -2, 6, 0, Math.PI * 2)
-        ctx.fill()
+      case 'sad':
+        drawSadEyes(ctx)
+        break
+      case 'bored':
+        drawBoredEyes(ctx)
+        break
+      case 'happy':
+        drawHappyEyes(ctx)
+        break
+      case 'crazy':
+        drawCrazyEyes(ctx)
+        break
+
+      // --- MONSTER ---
+      case 'cyclops':
+        drawCyclopsEye(ctx)
+        break
+      case 'triclops':
+        drawTriclopsEyes(ctx)
+        break
+      case 'spider':
+        drawSpiderEyes(ctx, eyeCount)
+        break
+      case 'snail':
+        drawSnailEyes(ctx)
+        break
+      case 'vertical':
+        drawVerticalEyes(ctx)
+        break
+
+      // --- TECH ---
+      case 'visor':
+        drawVisor(ctx)
         break
       case 'laser':
-        ctx.fillStyle = '#00ff00'
-        ctx.strokeStyle = '#00ff00'
-        ctx.lineWidth = 3
-        // Laser beams
-        ctx.beginPath()
-        ctx.moveTo(-20, 0)
-        ctx.lineTo(-80, 0)
-        ctx.stroke()
-        ctx.beginPath()
-        ctx.moveTo(20, 0)
-        ctx.lineTo(80, 0)
-        ctx.stroke()
-        // Eyes
-        ctx.beginPath()
-        ctx.arc(-20, 0, 8, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.beginPath()
-        ctx.arc(20, 0, 8, 0, Math.PI * 2)
-        ctx.fill()
+        drawLaserEyes(ctx)
         break
+      case 'hypno':
+        drawHypnoEyes(ctx)
+        break
+      case 'matrix':
+        drawMatrixEyes(ctx)
+        break
+      case 'glowing':
+        drawGlowingEyes(ctx)
+        break
+      case 'scanner':
+        drawScannerEye(ctx)
+        break
+
+      default:
+        drawStandardEyes(ctx, 10, '#333')
     }
 
     ctx.restore()
@@ -557,6 +544,250 @@ function CreatureCanvas({ creature, size = 300 }) {
     }
 
     ctx.restore()
+  }
+
+  // --- DRAWING HELPERS ---
+
+  const drawStandardEyes = (ctx, r, pupilColor, glint = false) => {
+    ctx.fillStyle = '#fff'
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 2
+    // Left
+    ctx.beginPath(); ctx.arc(-20, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Right
+    ctx.beginPath(); ctx.arc(20, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // Pupils
+    ctx.fillStyle = pupilColor
+    ctx.beginPath(); ctx.arc(-20, 0, r / 2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(20, 0, r / 2, 0, Math.PI * 2); ctx.fill();
+
+    if (glint) {
+      ctx.fillStyle = '#fff'
+      ctx.beginPath(); ctx.arc(-22, -2, r / 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(18, -2, r / 4, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  const drawAnimeEyes = (ctx) => {
+    ctx.fillStyle = '#fff'
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 2
+    // Draw large ovals
+    ctx.beginPath(); ctx.ellipse(-20, 0, 15, 20, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(20, 0, 15, 20, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Sparkles
+    ctx.fillStyle = '#333'
+    ctx.beginPath(); ctx.arc(-20, 4, 10, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(20, 4, 10, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff'
+    ctx.beginPath(); ctx.arc(-25, -5, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(15, -5, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-18, 8, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(22, 8, 3, 0, Math.PI * 2); ctx.fill();
+  }
+
+  const drawAngryEyes = (ctx) => {
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 4
+    // Eyebrows
+    ctx.beginPath(); ctx.moveTo(-35, -10); ctx.lineTo(-10, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(35, -10); ctx.lineTo(10, 0); ctx.stroke();
+    // Eyes
+    drawStandardEyes(ctx, 10, '#333')
+  }
+
+  const drawSadEyes = (ctx) => {
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 3
+    // Droopy brows
+    ctx.beginPath(); ctx.moveTo(-35, 0); ctx.lineTo(-15, -10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(35, 0); ctx.lineTo(15, -10); ctx.stroke();
+    // Wet Eyes
+    drawStandardEyes(ctx, 12, '#333')
+    ctx.fillStyle = '#00aaff' // Tears
+    ctx.beginPath(); ctx.arc(-20, 10, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(20, 10, 5, 0, Math.PI * 2); ctx.fill();
+  }
+
+  const drawBoredEyes = (ctx) => {
+    // Half closed eyelids
+    ctx.fillStyle = '#fff'
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 2
+    // Eyes
+    ctx.beginPath(); ctx.arc(-20, 0, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(20, 0, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Pupils
+    ctx.fillStyle = '#333'
+    ctx.beginPath(); ctx.arc(-20, 0, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(20, 0, 3, 0, Math.PI * 2); ctx.fill();
+    // Eyelids
+    ctx.fillStyle = '#ddd'
+    ctx.beginPath(); ctx.rect(-30, -10, 20, 10); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.rect(10, -10, 20, 10); ctx.fill(); ctx.stroke();
+  }
+
+  const drawHappyEyes = (ctx) => {
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 3
+    ctx.beginPath(); ctx.arc(-20, 0, 10, Math.PI, 0); ctx.stroke();
+    ctx.beginPath(); ctx.arc(20, 0, 10, Math.PI, 0); ctx.stroke();
+  }
+
+  const drawCrazyEyes = (ctx) => {
+    drawStandardEyes(ctx, 12, '#333')
+    // Spiral pupils? Or just mismatched
+    ctx.fillStyle = '#fff'
+    ctx.beginPath(); ctx.arc(-20, 0, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(20, 0, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#333'
+    ctx.beginPath(); ctx.arc(-20, 0, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(20, 0, 2, 0, Math.PI * 2); ctx.fill();
+
+    // Spiral lines
+    ctx.strokeStyle = '#000'
+    ctx.lineWidth = 1
+    ctx.beginPath(); ctx.arc(-20, 0, 8, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(20, 0, 5, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  const drawCyclopsEye = (ctx) => {
+    ctx.fillStyle = '#fff'
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 3
+    ctx.beginPath(); ctx.arc(0, -10, 30, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#333'
+    ctx.beginPath(); ctx.arc(0, -10, 10, 0, Math.PI * 2); ctx.fill();
+    // Glint
+    ctx.fillStyle = '#fff'
+    ctx.beginPath(); ctx.arc(5, -15, 5, 0, Math.PI * 2); ctx.fill();
+  }
+
+  const drawTriclopsEyes = (ctx) => {
+    // Three eyes in triangle
+    ctx.translate(0, -10)
+    drawStandardEyes(ctx, 10, '#333') // Bottom two
+    // Top one
+    ctx.fillStyle = '#fff'
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 2
+    ctx.beginPath(); ctx.arc(0, -25, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#333'
+    ctx.beginPath(); ctx.arc(0, -25, 5, 0, Math.PI * 2); ctx.fill();
+  }
+
+  const drawSpiderEyes = (ctx, count) => {
+    ctx.fillStyle = '#000'
+    // Main pair
+    ctx.beginPath(); ctx.arc(-15, 0, 8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(15, 0, 8, 0, Math.PI * 2); ctx.fill();
+    // Additional eyes
+    const extra = count - 2
+    if (extra > 0) {
+      ctx.beginPath(); ctx.arc(0, -15, 6, 0, Math.PI * 2); ctx.fill();
+    }
+    if (extra >= 3) {
+      ctx.beginPath(); ctx.arc(-25, -10, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(25, -10, 4, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  const drawSnailEyes = (ctx) => {
+    // Stalks
+    ctx.strokeStyle = '#666' // Snail skin color?
+    ctx.lineWidth = 6
+    ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(-40, -40); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(20, 0); ctx.lineTo(40, -40); ctx.stroke();
+    // Eyes on top
+    ctx.translate(-40, -40); drawStandardEyes(ctx, 8, '#333'); ctx.translate(40, 40); // reuse helper?? No, position is diff
+
+    // Draw manually at tips
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(-40, -40, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(40, -40, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#000'
+    ctx.beginPath(); ctx.arc(-40, -40, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(40, -40, 3, 0, Math.PI * 2); ctx.fill();
+  }
+
+  const drawVerticalEyes = (ctx) => {
+    ctx.fillStyle = '#fff9cc' // Yellowish
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 2
+    ctx.beginPath(); ctx.arc(-20, 0, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(20, 0, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // Slit pupils
+    ctx.fillStyle = '#000'
+    ctx.beginPath(); ctx.ellipse(-20, 0, 2, 10, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(20, 0, 2, 10, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
+  const drawVisor = (ctx) => {
+    ctx.fillStyle = '#00ffff'
+    ctx.strokeStyle = '#009999'
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.roundRect(-50, -15, 100, 30, 5)
+    ctx.fill()
+    ctx.stroke()
+    // Scan line
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+    ctx.beginPath(); ctx.moveTo(-45, 0); ctx.lineTo(45, 0); ctx.stroke();
+  }
+
+  const drawLaserEyes = (ctx) => {
+    // Red glowing eyes
+    ctx.fillStyle = '#ff0000'
+    ctx.shadowColor = 'red'; ctx.shadowBlur = 20;
+    ctx.beginPath(); ctx.arc(-20, 0, 8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(20, 0, 8, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Beams
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)'
+    ctx.lineWidth = 4
+    ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(-100, 50); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(20, 0); ctx.lineTo(100, 50); ctx.stroke();
+  }
+
+  const drawHypnoEyes = (ctx) => {
+    ctx.strokeStyle = '#ff00ff'
+    ctx.lineWidth = 2
+    for (let r = 2; r < 15; r += 4) {
+      ctx.beginPath(); ctx.arc(-20, 0, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(20, 0, r, 0, Math.PI * 2); ctx.stroke();
+    }
+  }
+
+  const drawMatrixEyes = (ctx) => {
+    ctx.fillStyle = '#0f0'
+    ctx.font = '12px monospace'
+    ctx.fillText('10', -30, 0)
+    ctx.fillText('01', -30, 10)
+    ctx.fillText('01', 15, 0)
+    ctx.fillText('10', 15, 10)
+  }
+
+  const drawGlowingEyes = (ctx) => {
+    ctx.fillStyle = '#ffff00'
+    ctx.shadowColor = 'yellow'; ctx.shadowBlur = 30;
+    ctx.beginPath(); ctx.arc(-20, 0, 10, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(20, 0, 10, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  const drawScannerEye = (ctx) => {
+    // Tech monocle
+    drawStandardEyes(ctx, 10, '#333')
+    ctx.strokeStyle = '#0f0'
+    ctx.lineWidth = 1
+    // Target reticle over left eye
+    ctx.beginPath(); ctx.arc(-20, 0, 15, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-35, 0); ctx.lineTo(-5, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-20, -15); ctx.lineTo(-20, 15); ctx.stroke();
   }
 
   return (

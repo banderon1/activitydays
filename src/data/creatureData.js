@@ -105,3 +105,53 @@ export const generateBodyTypes = () => {
 }
 
 export const bodyTypes = generateBodyTypes()
+
+export const generateEyeTypes = () => {
+    const types = []
+
+    // 1. Basic Eyes
+    // Neutral stats
+    const basicEyes = [
+        { id: 'eye_dots', name: 'Standard Dots', type: 'dots', stats: { speed: 2, strength: 2, defense: 2 } },
+        { id: 'eye_anime', name: 'Sparkle Anime', type: 'anime', stats: { speed: 3, strength: 1, defense: 2 } },
+        { id: 'eye_big', name: 'Big Puppy', type: 'big', stats: { speed: 1, strength: 1, defense: 3 } }, // cuteness = defense?
+        { id: 'eye_small', name: 'Beady Small', type: 'small', stats: { speed: 3, strength: 2, defense: 1 } }
+    ]
+    types.push(...basicEyes)
+
+    // 2. Emotions
+    const emotionEyes = [
+        { id: 'eye_angry', name: 'Furious', type: 'angry', stats: { strength: 6, defense: 1, speed: 3 } },
+        { id: 'eye_sad', name: 'Teary', type: 'sad', stats: { defense: 5, strength: 1, speed: 2 } },
+        { id: 'eye_bored', name: 'Unimpressed', type: 'bored', stats: { defense: 6, speed: 1, strength: 2 } },
+        { id: 'eye_happy', name: 'Joyful', type: 'happy', stats: { speed: 6, strength: 2, defense: 2 } },
+        { id: 'eye_crazy', name: 'Wild', type: 'crazy', stats: { strength: 5, speed: 5, defense: 0 } }
+    ]
+    types.push(...emotionEyes)
+
+    // 3. Monster Eyes
+    const monsterEyes = [
+        { id: 'eye_cyclops', name: 'Cyclops', type: 'cyclops', stats: { strength: 8, defense: 3, speed: 1 } },
+        { id: 'eye_triclops', name: 'Tri-clops', type: 'triclops', stats: { speed: 5, strength: 4, defense: 3 } },
+        { id: 'eye_spider_3', name: 'Spider (3 Eyes)', type: 'spider', count: 3, stats: { speed: 6, defense: 3, strength: 2 } },
+        { id: 'eye_spider_5', name: 'Spider (5 Eyes)', type: 'spider', count: 5, stats: { speed: 8, defense: 2, strength: 2 } },
+        { id: 'eye_snail', name: 'Snail Stalks', type: 'snail', stats: { defense: 7, speed: 1, strength: 2 } },
+        { id: 'eye_vertical', name: 'Vertical Slit', type: 'vertical', stats: { strength: 5, speed: 4, defense: 2 } }
+    ]
+    types.push(...monsterEyes)
+
+    // 4. Tech/Magic Eyes
+    const techEyes = [
+        { id: 'eye_visor', name: 'Cyber Visor', type: 'visor', stats: { defense: 8, strength: 3, speed: 3 } },
+        { id: 'eye_laser', name: 'Laser Beam', type: 'laser', stats: { strength: 9, speed: 4, defense: 1 } },
+        { id: 'eye_hypno', name: 'Hypno Spiral', type: 'hypno', stats: { speed: 7, defense: 4, strength: 1 } },
+        { id: 'eye_matrix', name: 'Digital Matrix', type: 'matrix', stats: { speed: 6, defense: 5, strength: 3 } },
+        { id: 'eye_glowing', name: 'Glowing Orbs', type: 'glowing', stats: { strength: 6, speed: 5, defense: 2 } },
+        { id: 'eye_scanner', name: 'Target Scope', type: 'scanner', stats: { strength: 7, speed: 6, defense: 2 } }
+    ]
+    types.push(...techEyes)
+
+    return types
+}
+
+export const eyeTypes = generateEyeTypes()

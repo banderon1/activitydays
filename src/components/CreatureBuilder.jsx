@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import CreatureCanvas from './CreatureCanvas'
-import { bodyTypes } from '../data/creatureData'
+import { bodyTypes, eyeTypes } from '../data/creatureData'
 import './CreatureBuilder.css'
 
-// Keep others for now as they are not yet data-driven, or we can move them too later
+// Keep others for now as they are not yet data-driven
 const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2']
-const eyeTypes = ['dots', 'angry', 'googly', 'laser']
+// const eyeTypes = ['dots', 'angry', 'googly', 'laser'] - Now imported
 const mouthTypes = ['smile', 'fangs', 'straight', 'roar']
 const armTypes = ['none', 'small', 'long', 'claws']
 const legTypes = ['none', 'stumpy', 'tall', 'wheels']
@@ -16,7 +16,7 @@ function CreatureBuilder({ onSave }) {
     name: '',
     bodyType: bodyTypes[0].id, // Default to first body
     color: colors[0],
-    eyeType: 'dots',
+    eyeType: eyeTypes[0].id,
     mouthType: 'smile',
     armType: 'small',
     legType: 'stumpy',
@@ -42,6 +42,14 @@ function CreatureBuilder({ onSave }) {
       defense = currentBody.stats.defense
     }
 
+    // Eye type affects stats
+    const currentEye = eyeTypes.find(e => e.id === creature.eyeType)
+    if (currentEye) {
+      strength += currentEye.stats.strength || 0
+      speed += currentEye.stats.speed || 0
+      defense += currentEye.stats.defense || 0
+    }
+
     // Arms affect strength
     if (creature.armType === 'claws') strength += 4
     if (creature.armType === 'long') strength += 2
@@ -65,7 +73,7 @@ function CreatureBuilder({ onSave }) {
       defense,
       health: 100
     }))
-  }, [creature.bodyType, creature.armType, creature.legType, creature.accessory])
+  }, [creature.bodyType, creature.eyeType, creature.armType, creature.legType, creature.accessory])
 
   const updateCreature = (key, value) => {
     setCreature(prev => ({ ...prev, [key]: value }))
@@ -81,6 +89,7 @@ function CreatureBuilder({ onSave }) {
     // For now, let's just save the state. The BattleArena will need to lookup the body by ID or we save the specialized props.
     // Let's attach special body props to the saved object.
     const currentBody = bodyTypes.find(b => b.id === creature.bodyType)
+    const currentEye = eyeTypes.find(e => e.id === creature.eyeType)
 
     onSave({
       ...creature,
@@ -91,7 +100,11 @@ function CreatureBuilder({ onSave }) {
         sides: currentBody.sides,
         roughness: currentBody.roughness,
         fluffiness: currentBody.fluffiness
-      }
+      },
+      eyeProps: currentEye ? {
+        type: currentEye.type,
+        count: currentEye.count
+      } : {}
     })
 
     // Reset to create new creature
@@ -99,7 +112,7 @@ function CreatureBuilder({ onSave }) {
       name: '',
       bodyType: bodyTypes[0].id,
       color: colors[0],
-      eyeType: 'dots',
+      eyeType: eyeTypes[0].id,
       mouthType: 'smile',
       armType: 'small',
       legType: 'stumpy',
@@ -117,7 +130,7 @@ function CreatureBuilder({ onSave }) {
       ...prev,
       bodyType: randomBody.id,
       color: colors[Math.floor(Math.random() * colors.length)],
-      eyeType: eyeTypes[Math.floor(Math.random() * eyeTypes.length)],
+      eyeType: eyeTypes[Math.floor(Math.random() * eyeTypes.length)].id,
       mouthType: mouthTypes[Math.floor(Math.random() * mouthTypes.length)],
       armType: armTypes[Math.floor(Math.random() * armTypes.length)],
       legType: legTypes[Math.floor(Math.random() * legTypes.length)],
@@ -127,6 +140,7 @@ function CreatureBuilder({ onSave }) {
 
   // Find current body for passing to Canvas preview
   const currentBodyData = bodyTypes.find(b => b.id === creature.bodyType) || bodyTypes[0]
+  const currentEyeData = eyeTypes.find(e => e.id === creature.eyeType) || eyeTypes[0]
   const creatureForCanvas = {
     ...creature,
     bodyProps: {
@@ -135,6 +149,10 @@ function CreatureBuilder({ onSave }) {
       sides: currentBodyData.sides,
       roughness: currentBodyData.roughness,
       fluffiness: currentBodyData.fluffiness
+    },
+    eyeProps: {
+      type: currentEyeData.type,
+      count: currentEyeData.count
     }
   }
 
@@ -222,18 +240,18 @@ function CreatureBuilder({ onSave }) {
         </div>
 
         <div className="control-group">
-          <label>Eyes:</label>
-          <div className="button-group">
+          <label>Eyes ({eyeTypes.length} Options):</label>
+          <select
+            value={creature.eyeType}
+            onChange={(e) => updateCreature('eyeType', e.target.value)}
+            className="body-selector"
+          >
             {eyeTypes.map(type => (
-              <button
-                key={type}
-                className={creature.eyeType === type ? 'selected' : ''}
-                onClick={() => updateCreature('eyeType', type)}
-              >
-                {type}
-              </button>
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
         <div className="control-group">
