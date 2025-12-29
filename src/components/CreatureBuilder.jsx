@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import CreatureCanvas from './CreatureCanvas'
-import { bodyTypes, eyeTypes } from '../data/creatureData'
+import { bodyTypes, eyeTypes, colors } from '../data/creatureData'
 import './CreatureBuilder.css'
 
 // Keep others for now as they are not yet data-driven
-const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2']
-// const eyeTypes = ['dots', 'angry', 'googly', 'laser'] - Now imported
+// const colors = [...] - Now imported
+// const eyeTypes = [...] - Now imported
 const mouthTypes = ['smile', 'fangs', 'straight', 'roar']
 const armTypes = ['none', 'small', 'long', 'claws']
 const legTypes = ['none', 'stumpy', 'tall', 'wheels']
@@ -15,7 +15,7 @@ function CreatureBuilder({ onSave }) {
   const [creature, setCreature] = useState({
     name: '',
     bodyType: bodyTypes[0].id, // Default to first body
-    color: colors[0],
+    color: colors[0].id,
     eyeType: eyeTypes[0].id,
     mouthType: 'smile',
     armType: 'small',
@@ -50,6 +50,14 @@ function CreatureBuilder({ onSave }) {
       defense += currentEye.stats.defense || 0
     }
 
+    // Color affects stats
+    const currentColor = colors.find(c => c.id === creature.color)
+    if (currentColor) {
+      strength += currentColor.stats.strength || 0
+      speed += currentColor.stats.speed || 0
+      defense += currentColor.stats.defense || 0
+    }
+
     // Arms affect strength
     if (creature.armType === 'claws') strength += 4
     if (creature.armType === 'long') strength += 2
@@ -73,7 +81,7 @@ function CreatureBuilder({ onSave }) {
       defense,
       health: 100
     }))
-  }, [creature.bodyType, creature.eyeType, creature.armType, creature.legType, creature.accessory])
+  }, [creature.bodyType, creature.eyeType, creature.color, creature.armType, creature.legType, creature.accessory])
 
   const updateCreature = (key, value) => {
     setCreature(prev => ({ ...prev, [key]: value }))
@@ -90,9 +98,12 @@ function CreatureBuilder({ onSave }) {
     // Let's attach special body props to the saved object.
     const currentBody = bodyTypes.find(b => b.id === creature.bodyType)
     const currentEye = eyeTypes.find(e => e.id === creature.eyeType)
+    const currentColor = colors.find(c => c.id === creature.color)
 
     onSave({
       ...creature,
+      color: currentColor ? currentColor.value : '#333', // Save actual hex for simple renderers
+      colorId: creature.color, // Save ID for editing/logic if needed logic later
       // Clone specific body rendering props so we don't depend on looking up data later if we don't want to
       bodyProps: {
         type: currentBody.type,
@@ -111,7 +122,7 @@ function CreatureBuilder({ onSave }) {
     setCreature({
       name: '',
       bodyType: bodyTypes[0].id,
-      color: colors[0],
+      color: colors[0].id,
       eyeType: eyeTypes[0].id,
       mouthType: 'smile',
       armType: 'small',
@@ -129,7 +140,7 @@ function CreatureBuilder({ onSave }) {
     setCreature(prev => ({
       ...prev,
       bodyType: randomBody.id,
-      color: colors[Math.floor(Math.random() * colors.length)],
+      color: colors[Math.floor(Math.random() * colors.length)].id,
       eyeType: eyeTypes[Math.floor(Math.random() * eyeTypes.length)].id,
       mouthType: mouthTypes[Math.floor(Math.random() * mouthTypes.length)],
       armType: armTypes[Math.floor(Math.random() * armTypes.length)],
@@ -138,11 +149,14 @@ function CreatureBuilder({ onSave }) {
     }))
   }
 
-  // Find current body for passing to Canvas preview
+  // Find current data for passing to Canvas preview
   const currentBodyData = bodyTypes.find(b => b.id === creature.bodyType) || bodyTypes[0]
   const currentEyeData = eyeTypes.find(e => e.id === creature.eyeType) || eyeTypes[0]
+  const currentColorData = colors.find(c => c.id === creature.color) || colors[0]
+
   const creatureForCanvas = {
     ...creature,
+    color: currentColorData.value, // Pass HEX to canvas
     bodyProps: {
       type: currentBodyData.type,
       points: currentBodyData.points,
@@ -226,14 +240,15 @@ function CreatureBuilder({ onSave }) {
         </div>
 
         <div className="control-group">
-          <label>Color:</label>
+          <label>Color ({colors.length} Options):</label>
           <div className="color-picker">
-            {colors.map(color => (
+            {colors.map(colorObj => (
               <button
-                key={color}
-                className={creature.color === color ? 'selected' : ''}
-                style={{ backgroundColor: color }}
-                onClick={() => updateCreature('color', color)}
+                key={colorObj.id}
+                className={creature.color === colorObj.id ? 'selected' : ''}
+                style={{ backgroundColor: colorObj.value }}
+                title={colorObj.name}
+                onClick={() => updateCreature('color', colorObj.id)}
               />
             ))}
           </div>

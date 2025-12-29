@@ -155,3 +155,45 @@ export const generateEyeTypes = () => {
 }
 
 export const eyeTypes = generateEyeTypes()
+
+export const generateColors = () => {
+    // 21 Colors with stats
+    // Strength (Red/Orange), Speed (Blue/Cyan/Yellow), Defense (Green/Brown/Grey)
+    return [
+        // REDS (Strength)
+        { id: 'col_red', name: 'Fiery Red', value: '#FF4136', stats: { strength: 3, speed: 1, defense: 0 } },
+        { id: 'col_crimson', name: 'Deep Crimson', value: '#85144b', stats: { strength: 4, defense: 1, speed: 0 } },
+        { id: 'col_maroon', name: 'Maroon', value: '#600000', stats: { strength: 3, defense: 2, speed: 0 } },
+
+
+        // ORANGES/YELLOWS (Mixed Strength/Speed)
+        { id: 'col_orange', name: 'Blaze Orange', value: '#FF851B', stats: { strength: 2, speed: 2, defense: 0 } },
+        { id: 'col_gold', name: 'Golden', value: '#FFD700', stats: { speed: 1, defense: 1, strength: 1 } }, // Balanced
+        { id: 'col_yellow', name: 'Lightning Yellow', value: '#FFDC00', stats: { speed: 4, strength: 1, defense: -1 } },
+
+        // GREENS (Defense/Speed)
+        { id: 'col_lime', name: 'Toxic Lime', value: '#01FF70', stats: { speed: 3, defense: 0, strength: 1 } },
+        { id: 'col_green', name: 'Leaf Green', value: '#2ECC40', stats: { defense: 2, speed: 2, strength: 0 } },
+        { id: 'col_forest', name: 'Forest Green', value: '#155e26', stats: { defense: 3, strength: 1, speed: 0 } },
+        { id: 'col_olive', name: 'Olive', value: '#3D9970', stats: { defense: 4, speed: -1, strength: 1 } },
+
+        // BLUES (Speed/Defense)
+        { id: 'col_aqua', name: 'Aqua', value: '#7FDBFF', stats: { speed: 3, defense: 1, strength: 0 } },
+        { id: 'col_sky', name: 'Sky Blue', value: '#6EC6FF', stats: { speed: 3, defense: 0, strength: 0 } },
+        { id: 'col_blue', name: 'Ocean Blue', value: '#0074D9', stats: { defense: 2, strength: 1, speed: 1 } },
+        { id: 'col_navy', name: 'Navy', value: '#001f3f', stats: { defense: 3, strength: 2, speed: -1 } },
+
+        // PURPLES/PINKS (Magic/Wild)
+        { id: 'col_purple', name: 'Mystic Purple', value: '#B10DC9', stats: { speed: 2, strength: 2, defense: 0 } },
+        { id: 'col_fuchsia', name: 'Fuchsia', value: '#F012BE', stats: { speed: 3, strength: 1, defense: 0 } },
+        { id: 'col_lavender', name: 'Lavender', value: '#E6E6FA', stats: { speed: 2, defense: 1, strength: 0 } },
+
+        // MONOCHROME/EARTH (Defense)
+        { id: 'col_white', name: 'Ghost White', value: '#FFFFFF', stats: { speed: 2, defense: 0, strength: 0 } },
+
+        { id: 'col_grey', name: 'Steel Grey', value: '#AAAAAA', stats: { defense: 3, strength: 1, speed: 0 } },
+        { id: 'col_brown', name: 'Earth Brown', value: '#8B4513', stats: { defense: 3, strength: 2, speed: -1 } }
+    ]
+}
+
+export const colors = generateColors()
