@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { bodyTypes, eyeTypes, colors, mouthTypes, armTypes, legTypes } from '../data/creatureData'
+import CreatureCanvas from './CreatureCanvas'
 import './CreatureBuilder.css'
 
 // Keep others for now as they are not yet data-driven
@@ -206,6 +207,8 @@ function CreatureBuilder({ onSave }) {
       type: (legTypes && legTypes.length > 0) ? (legTypes.find(l => l.id === creature.legType) || legTypes[0]).type : 'stumpy'
     }
   }
+
+  console.log('Rendering CreatureBuilder with creatureForCanvas:', creatureForCanvas);
 
   return (
     <div className="creature-builder">

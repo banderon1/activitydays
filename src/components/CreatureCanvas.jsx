@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react'
 
 function CreatureCanvas({ creature, size = 300 }) {
+  console.log('CreatureCanvas MOUNTED with:', creature);
   const canvasRef = useRef(null)
 
   useEffect(() => {
@@ -16,31 +17,39 @@ function CreatureCanvas({ creature, size = 300 }) {
     ctx.scale(scale, scale)
 
     // Draw legs
+    console.log('Scaling done. Drawing Legs...');
     drawLegs(ctx, creature)
 
     // Draw body
+    console.log('Drawing Body...');
     drawBody(ctx, creature)
 
     // Draw arms
+    console.log('Drawing Arms...');
     drawArms(ctx, creature)
 
     // Draw accessory (behind face)
     if (creature.accessory !== 'none' && creature.accessory !== 'crown') {
+      console.log('Drawing Accessory (Rear)...');
       drawAccessory(ctx, creature)
     }
 
     // Draw eyes
+    console.log('Drawing Eyes...');
     drawEyes(ctx, creature)
 
     // Draw mouth
+    console.log('Drawing Mouth...');
     drawMouth(ctx, creature)
 
     // Draw crown (on top)
     if (creature.accessory === 'crown') {
+      console.log('Drawing Accessory (Crown)...');
       drawAccessory(ctx, creature)
     }
 
     ctx.restore()
+    console.log('Canvas rendering completed.');
   }, [creature, size])
 
   const drawBody = (ctx, creature) => {
