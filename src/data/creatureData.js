@@ -1,7 +1,7 @@
 export const generateBodyTypes = () => {
     const types = []
 
-    // Basic Shapes
+    // Basic Shapes (Water/Balanced)
     const basicShapes = ['round', 'square', 'triangle', 'blob']
     const basicNames = {
         'round': 'Circle',
@@ -14,11 +14,12 @@ export const generateBodyTypes = () => {
             id: `basic_${shape}`,
             name: basicNames[shape],
             type: shape,
+            element: 'water',
             stats: { speed: 5, strength: 5, defense: 5 }
         })
     })
 
-    // Stars
+    // Stars (Fire/Fast but Fragile)
     // 3-12 points
     const starPrefixes = {
         3: 'Tri', 4: 'Quad', 5: 'Penta', 6: 'Hexa',
@@ -30,16 +31,17 @@ export const generateBodyTypes = () => {
             id: `star_${i}`,
             name: `${starPrefixes[i]}star`,
             type: 'star',
+            element: 'fire',
             points: i,
             stats: {
-                speed: 5 + Math.floor(i / 2),
+                speed: 6 + Math.floor(i / 2),
                 strength: 4 + Math.floor(i / 3),
-                defense: 5 - Math.floor(i / 4)
+                defense: 3 - Math.floor(i / 4) // Trade-off: Lower defense
             }
         })
     }
 
-    // Polygons
+    // Polygons (Tech/Strong but Slow)
     // 3-12 sides
     const polyNames = {
         3: 'Triangle', 4: 'Square', 5: 'Pentagon', 6: 'Hexagon',
@@ -51,16 +53,18 @@ export const generateBodyTypes = () => {
             id: `poly_${i}`,
             name: polyNames[i] || `Polygon-${i}`,
             type: 'polygon',
+            element: 'tech',
             sides: i,
             stats: {
                 defense: 5 + Math.floor(i / 2),
-                strength: 5 + Math.floor(i / 4),
-                speed: 6 - Math.floor(i / 3)
+                strength: 6 + Math.floor(i / 4),
+                speed: 4 - Math.floor(i / 3) // Trade-off: Slower
             }
         })
     }
 
-    // Rocks (1-10 roughness)
+    // Rocks (Nature/Tank but Very Slow)
+    // 1-10 roughness
     // Map roughness to creative names
     const rockNames = [
         'Smooth Stone', 'Pebble', 'Cobble', 'Rock',
@@ -72,16 +76,18 @@ export const generateBodyTypes = () => {
             id: `rock_${i}`,
             name: rockNames[i - 1],
             type: 'rock',
+            element: 'nature',
             roughness: i,
             stats: {
-                defense: 7 + Math.floor(i / 2),
-                speed: 4 - Math.floor(i / 4),
+                defense: 8 + Math.floor(i / 2),
+                speed: 2 - Math.floor(i / 3), // Trade-off: Very slow
                 strength: 6
             }
         })
     }
 
-    // Clouds (1-10 fluffiness)
+    // Clouds (Air -> Water/Fast but Weak)
+    // 1-10 fluffiness
     const cloudNames = [
         'Wisp', 'Mist', 'Puff', 'Vapor',
         'Cloud', 'Cumulus', 'Stratus', 'Nimbus',
@@ -92,11 +98,12 @@ export const generateBodyTypes = () => {
             id: `cloud_${i}`,
             name: cloudNames[i - 1],
             type: 'cloud',
+            element: 'water', // Using Water for "Air/Cloud" for now
             fluffiness: i,
             stats: {
-                speed: 6 + Math.floor(i / 3),
-                defense: 5 + Math.floor(i / 4),
-                strength: 4
+                speed: 8 + Math.floor(i / 3),
+                defense: 3 + Math.floor(i / 4), // Trade-off: Low defense
+                strength: 3 // Trade-off: Low strength
             }
         })
     }
@@ -335,10 +342,10 @@ export const generateLegTypes = () => {
     const techLegs = [
         { id: 'leg_robot', name: 'Tech Walkers', type: 'walker', stats: { speed: 3, defense: 4, strength: 4 } },
         { id: 'leg_treads', name: 'Tank Treads', type: 'treads', stats: { speed: 2, defense: 7, strength: 5 } },
-        { id: 'leg_jet', name: 'Hover Jet', type: 'jet', stats: { speed: 8, defense: 1, strength: 1 } },
+        { id: 'leg_jet', name: 'Hover Jet', type: 'jet', stats: { speed: 8, defense: 1, strength: 1, health: -10 } }, // Unstable!
         { id: 'leg_antigrav', name: 'Anti-Grav', type: 'antigrav', stats: { speed: 6, defense: 3, strength: 0 } },
-        { id: 'leg_mech', name: 'Mech Legs', type: 'mech', stats: { strength: 6, defense: 5, speed: 2 } },
-        { id: 'leg_skates', name: 'Roller Skates', type: 'skates', stats: { speed: 7, strength: 1, defense: 0 } }
+        { id: 'leg_mech', name: 'Mech Legs', type: 'mech', stats: { strength: 6, defense: 5, speed: 1 } }, // Heavy!
+        { id: 'leg_skates', name: 'Roller Skates', type: 'skates', stats: { speed: 7, strength: 1, defense: -2 } } // Unstable!
     ]
     types.push(...techLegs)
 
@@ -366,16 +373,17 @@ const generateAccessoryTypes = () => {
         { id: 'acc_monocle', name: 'Monocle', type: 'monocle', layer: 'front', stats: { speed: 0, strength: 0, defense: 0, health: 0 } },
         { id: 'acc_mask', name: 'Hero Mask', type: 'mask', layer: 'front', stats: { speed: 0, strength: 0, defense: 2, health: 0 } },
         { id: 'acc_mustache', name: 'Mustache', type: 'mustache', layer: 'front', stats: { speed: 0, strength: 1, defense: 0, health: 0 } },
-        { id: 'acc_patch', name: 'Eye Patch', type: 'eyepatch', layer: 'front', stats: { speed: 0, strength: 2, defense: 0, health: 0 } },
+        { id: 'acc_patch', name: 'Eye Patch', type: 'eyepatch', layer: 'front', stats: { speed: 0, strength: 3, defense: 0, health: 0 } }, // Stronger but...
 
         // --- BACK (Back) ---
-        { id: 'acc_wings_bat', name: 'Bat Wings', type: 'wings_bat', layer: 'back', stats: { speed: 3, strength: 0, defense: 0, health: 0 } },
+        // --- BACK (Back) ---
+        { id: 'acc_wings_bat', name: 'Bat Wings', type: 'wings_bat', layer: 'back', stats: { speed: 3, strength: 0, defense: 0, health: -5 } }, // Frail
         { id: 'acc_wings_angel', name: 'Angel Wings', type: 'wings_angel', layer: 'back', stats: { speed: 2, strength: 0, defense: 1, health: 0 } },
         { id: 'acc_cape', name: 'Hero Cape', type: 'cape', layer: 'back', stats: { speed: 1, strength: 0, defense: 1, health: 0 } },
-        { id: 'acc_jetpack', name: 'Jetpack', type: 'jetpack', layer: 'back', stats: { speed: 5, strength: 0, defense: 1, health: 0 } },
-        { id: 'acc_spikes', name: 'Back Spikes', type: 'spikes', layer: 'back', stats: { speed: 0, strength: 0, defense: 4, health: 0 } },
-        { id: 'acc_shell', name: 'Turtle Shell', type: 'shell', layer: 'back', stats: { speed: -2, strength: 0, defense: 8, health: 0 } },
-        { id: 'acc_backpack', name: 'Backpack', type: 'backpack', layer: 'back', stats: { speed: -1, strength: 0, defense: 0, health: 5 } },
+        { id: 'acc_jetpack', name: 'Jetpack', type: 'jetpack', layer: 'back', stats: { speed: 6, strength: 0, defense: 1, health: -5 } }, // Fast but dangerous
+        { id: 'acc_spikes', name: 'Back Spikes', type: 'spikes', layer: 'back', stats: { speed: 0, strength: 2, defense: 4, health: 0 } },
+        { id: 'acc_shell', name: 'Turtle Shell', type: 'shell', layer: 'back', stats: { speed: -4, strength: 0, defense: 10, health: 0 } }, // Very heavy
+        { id: 'acc_backpack', name: 'Backpack', type: 'backpack', layer: 'back', stats: { speed: -2, strength: 0, defense: 0, health: 10 } }, // Heavy load
 
         // --- FLOATING (Front/All) ---
         { id: 'acc_flies', name: 'Swarm of Flies', type: 'flies', layer: 'front', stats: { speed: 0, strength: 0, defense: -1, health: -2 } },

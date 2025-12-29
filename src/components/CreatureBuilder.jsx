@@ -229,25 +229,30 @@ function CreatureBuilder({ onSave }) {
         </div>
 
         <div className="stats-panel">
-          <h3>Stats</h3>
+          <h3>
+            Stats
+            <span className={`type-badge type-${currentBodyData.element || 'neutral'}`}>
+              {currentBodyData.element ? currentBodyData.element.toUpperCase() : 'NEUTRAL'}
+            </span>
+          </h3>
           <div className="stat">
             <span>💪 Strength:</span>
             <div className="stat-bar">
-              <div className="stat-fill" style={{ width: `${Math.min(100, creature.strength * 5)}%` }}></div>
+              <div className="stat-fill" style={{ width: `${Math.max(0, Math.min(100, creature.strength * 5))}%`, backgroundColor: creature.strength < 0 ? '#ff4d4d' : undefined }}></div>
             </div>
             <span>{creature.strength}</span>
           </div>
           <div className="stat">
             <span>⚡ Speed:</span>
             <div className="stat-bar">
-              <div className="stat-fill" style={{ width: `${Math.min(100, creature.speed * 5)}%` }}></div>
+              <div className="stat-fill" style={{ width: `${Math.max(0, Math.min(100, creature.speed * 5))}%`, backgroundColor: creature.speed < 0 ? '#ff4d4d' : undefined }}></div>
             </div>
             <span>{creature.speed}</span>
           </div>
           <div className="stat">
             <span>🛡️ Defense:</span>
             <div className="stat-bar">
-              <div className="stat-fill" style={{ width: `${Math.min(100, creature.defense * 5)}%` }}></div>
+              <div className="stat-fill" style={{ width: `${Math.max(0, Math.min(100, creature.defense * 5))}%`, backgroundColor: creature.defense < 0 ? '#ff4d4d' : undefined }}></div>
             </div>
             <span>{creature.defense}</span>
           </div>
