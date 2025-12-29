@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
-import CreatureCanvas from './CreatureCanvas'
-import { bodyTypes, eyeTypes, colors, mouthTypes, armTypes } from '../data/creatureData'
+import { useState, useEffect } from 'react'
+import { bodyTypes, eyeTypes, colors, mouthTypes, armTypes, legTypes } from '../data/creatureData'
 import './CreatureBuilder.css'
 
 // Keep others for now as they are not yet data-driven
@@ -8,10 +7,13 @@ import './CreatureBuilder.css'
 // const eyeTypes = [...] - Now imported
 // const mouthTypes = [...] - Now imported
 // const armTypes = [...] - Now imported
-const legTypes = ['none', 'stumpy', 'tall', 'wheels']
+// const legTypes = [...] - Now imported
 const accessoryTypes = ['none', 'horns', 'antenna', 'spikes', 'crown']
 
 function CreatureBuilder({ onSave }) {
+  console.log('CreatureBuilder legTypes:', legTypes);
+  const safeLegType = (legTypes && legTypes.length > 0) ? legTypes[0].id : 'leg_stumpy';
+
   const [creature, setCreature] = useState({
     name: '',
     bodyType: bodyTypes[0].id, // Default to first body
@@ -19,7 +21,7 @@ function CreatureBuilder({ onSave }) {
     eyeType: eyeTypes[0].id,
     mouthType: mouthTypes[0].id,
     armType: armTypes[0].id,
-    legType: 'stumpy',
+    legType: safeLegType,
     accessory: 'none',
     // Base Stats
     strength: 5,
@@ -63,8 +65,6 @@ function CreatureBuilder({ onSave }) {
     if (currentMouth) {
       strength += currentMouth.stats.strength || 0
       speed += currentMouth.stats.speed || 0
-      strength += currentMouth.stats.strength || 0
-      speed += currentMouth.stats.speed || 0
       defense += currentMouth.stats.defense || 0
     }
 
@@ -76,10 +76,14 @@ function CreatureBuilder({ onSave }) {
       defense += currentArm.stats.defense || 0
     }
 
-    // Legs affect speed
-    if (creature.legType === 'wheels') speed += 4
-    if (creature.legType === 'tall') speed += 3
-    if (creature.legType === 'stumpy') speed += 1
+    // Legs affect stats
+    // Legs affect stats
+    const currentLeg = (legTypes && legTypes.find) ? legTypes.find(l => l.id === creature.legType) : null
+    if (currentLeg) {
+      strength += currentLeg.stats.strength || 0
+      speed += currentLeg.stats.speed || 0
+      defense += currentLeg.stats.defense || 0
+    }
 
     // Accessories provide bonuses
     if (creature.accessory === 'horns') strength += 2
@@ -114,6 +118,7 @@ function CreatureBuilder({ onSave }) {
     const currentColor = colors.find(c => c.id === creature.color)
     const currentMouth = mouthTypes.find(m => m.id === creature.mouthType)
     const currentArm = armTypes.find(a => a.id === creature.armType)
+    const currentLeg = legTypes.find(l => l.id === creature.legType)
 
     onSave({
       ...creature,
@@ -135,6 +140,9 @@ function CreatureBuilder({ onSave }) {
       } : {},
       armProps: currentArm ? {
         type: currentArm.type
+      } : {},
+      legProps: currentLeg ? {
+        type: currentLeg.type
       } : {}
     })
 
@@ -146,7 +154,7 @@ function CreatureBuilder({ onSave }) {
       eyeType: eyeTypes[0].id,
       mouthType: mouthTypes[0].id,
       armType: armTypes[0].id,
-      legType: 'stumpy',
+      legType: legTypes[0].id,
       accessory: 'none',
       strength: 5,
       speed: 5,
@@ -164,7 +172,7 @@ function CreatureBuilder({ onSave }) {
       eyeType: eyeTypes[Math.floor(Math.random() * eyeTypes.length)].id,
       mouthType: mouthTypes[Math.floor(Math.random() * mouthTypes.length)].id,
       armType: armTypes[Math.floor(Math.random() * armTypes.length)].id,
-      legType: legTypes[Math.floor(Math.random() * legTypes.length)],
+      legType: legTypes[Math.floor(Math.random() * legTypes.length)].id,
       accessory: accessoryTypes[Math.floor(Math.random() * accessoryTypes.length)]
     }))
   }
@@ -193,6 +201,9 @@ function CreatureBuilder({ onSave }) {
     },
     armProps: {
       type: (armTypes.find(a => a.id === creature.armType) || armTypes[0]).type
+    },
+    legProps: {
+      type: (legTypes && legTypes.length > 0) ? (legTypes.find(l => l.id === creature.legType) || legTypes[0]).type : 'stumpy'
     }
   }
 
@@ -326,18 +337,18 @@ function CreatureBuilder({ onSave }) {
         </div>
 
         <div className="control-group">
-          <label>Legs:</label>
-          <div className="button-group">
+          <label>Legs ({legTypes.length} Options):</label>
+          <select
+            value={creature.legType}
+            onChange={(e) => updateCreature('legType', e.target.value)}
+            className="body-selector"
+          >
             {legTypes.map(type => (
-              <button
-                key={type}
-                className={creature.legType === type ? 'selected' : ''}
-                onClick={() => updateCreature('legType', type)}
-              >
-                {type}
-              </button>
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
         <div className="control-group">

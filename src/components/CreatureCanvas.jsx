@@ -661,45 +661,196 @@ function CreatureCanvas({ creature, size = 300 }) {
     ctx.fillStyle = creature.color
     ctx.lineWidth = 10
 
-    switch (creature.legType) {
-      case 'stumpy':
-        // Left leg
-        ctx.beginPath()
-        ctx.moveTo(-30, 0)
-        ctx.lineTo(-30, 20)
-        ctx.stroke()
-        // Right leg
-        ctx.beginPath()
-        ctx.moveTo(30, 0)
-        ctx.lineTo(30, 20)
-        ctx.stroke()
+    // Determine leg type from props or direct type
+    const legProps = creature.legProps || {}
+    const legType = legProps.type || (creature.legType ? creature.legType.split('_')[1] || 'stumpy' : 'stumpy')
+
+    switch (legType) {
+      // --- BASIC ---
+      case 'none':
         break
-      case 'tall':
-        // Left leg
-        ctx.beginPath()
-        ctx.moveTo(-30, 0)
-        ctx.lineTo(-30, 50)
-        ctx.stroke()
-        // Right leg
-        ctx.beginPath()
-        ctx.moveTo(30, 0)
-        ctx.lineTo(30, 50)
-        ctx.stroke()
+      case 'stumpy':
+        // Left
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-30, 20); ctx.stroke();
+        // Right
+        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(30, 20); ctx.stroke();
+        break
+      case 'human':
+        ctx.lineWidth = 12;
+        // Left
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-30, 60); ctx.lineTo(-40, 60); ctx.stroke();
+        // Right
+        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(30, 60); ctx.lineTo(40, 60); ctx.stroke();
+        break
+      case 'stick':
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-35, 60); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(35, 60); ctx.stroke();
+        break
+      case 'fat':
+        ctx.lineWidth = 25;
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-30, 30); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(30, 30); ctx.stroke();
+        break
+
+      // --- SPEED ---
+      case 'cat':
+        ctx.lineWidth = 10;
+        // Left
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.quadraticCurveTo(-40, 20, -35, 40); ctx.stroke();
+        // Right
+        ctx.beginPath(); ctx.moveTo(30, 0); ctx.quadraticCurveTo(40, 20, 35, 40); ctx.stroke();
+        break
+      case 'cheetah':
+        ctx.lineWidth = 8;
+        // Jointed fast legs
+        const drawCheetahLeg = (x) => {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x * 1.2, 20); ctx.lineTo(x, 50); ctx.lineTo(x * 1.3, 55); ctx.stroke();
+        }
+        drawCheetahLeg(-30); drawCheetahLeg(30);
+        break
+      case 'rabbit':
+        ctx.lineWidth = 10;
+        const drawRabbitFoot = (x) => {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 30); ctx.stroke();
+          ctx.fillStyle = creature.color || '#fff';
+          ctx.beginPath(); ctx.ellipse(x * 1.2, 35, 10, 20, Math.PI / 2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        }
+        drawRabbitFoot(-30); drawRabbitFoot(30);
         break
       case 'wheels':
-        ctx.fillStyle = '#333'
-        ctx.strokeStyle = '#333'
-        // Left wheel
-        ctx.beginPath()
-        ctx.arc(-30, 15, 15, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
-        // Right wheel
-        ctx.beginPath()
-        ctx.arc(30, 15, 15, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
+        ctx.fillStyle = '#333'; ctx.strokeStyle = '#333';
+        // Left
+        ctx.beginPath(); ctx.arc(-30, 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#aaa'; ctx.beginPath(); ctx.arc(-30, 15, 5, 0, Math.PI * 2); ctx.fill();
+        // Right
+        ctx.fillStyle = '#333';
+        ctx.beginPath(); ctx.arc(30, 15, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#aaa'; ctx.beginPath(); ctx.arc(30, 15, 5, 0, Math.PI * 2); ctx.fill();
         break
+      case 'springs':
+        ctx.strokeStyle = '#999'; ctx.lineWidth = 3;
+        const drawSpring = (x) => {
+          ctx.beginPath();
+          for (let i = 0; i < 6; i++) {
+            ctx.moveTo(x + (i % 2 === 0 ? -10 : 10), i * 10);
+            ctx.lineTo(x + (i % 2 === 0 ? 10 : -10), i * 10 + 10);
+          }
+          ctx.stroke();
+        }
+        drawSpring(-30); drawSpring(30);
+        break
+
+      // --- MONSTER ---
+      case 'spider':
+        ctx.lineWidth = 4;
+        const drawSpiderLeg = (xStart, xKnee, yKnee, xKnee2, yKnee2) => {
+          ctx.beginPath(); ctx.moveTo(xStart, 0); ctx.lineTo(xKnee, yKnee); ctx.lineTo(xKnee2, yKnee2); ctx.stroke();
+        }
+        // 4 legs
+        drawSpiderLeg(-20, -60, -20, -80, 40);
+        drawSpiderLeg(-10, -50, -10, -60, 50);
+        drawSpiderLeg(10, 50, -10, 60, 50);
+        drawSpiderLeg(20, 60, -20, 80, 40);
+        break
+      case 'tentacles':
+        ctx.lineWidth = 10; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(-20, 0); ctx.bezierCurveTo(-40, 30, -10, 50, -50, 60); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(20, 0); ctx.bezierCurveTo(40, 30, 10, 50, 50, 60); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(10, 20, -10, 40, 0, 60); ctx.stroke();
+        break
+      case 'slime':
+        ctx.fillStyle = 'rgba(100,255,100,0.5)';
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.quadraticCurveTo(0, 40, 30, 0); ctx.fill();
+        break
+      case 'hooves':
+        ctx.lineWidth = 12;
+        const drawHoof = (x) => {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 40); ctx.stroke();
+          ctx.fillStyle = '#222';
+          ctx.fillRect(x - 8, 40, 16, 10);
+        }
+        drawHoof(-30); drawHoof(30);
+        break
+      case 'clawed': // Raptor
+        ctx.lineWidth = 8;
+        const drawClawLeg = (x) => {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 30); ctx.stroke();
+          // Claws
+          ctx.beginPath(); ctx.moveTo(x, 30); ctx.lineTo(x - 10, 45); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x, 30); ctx.lineTo(x, 50); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x, 30); ctx.lineTo(x + 10, 45); ctx.stroke();
+        }
+        drawClawLeg(-30); drawClawLeg(30);
+        break
+      case 'roots':
+        ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 5;
+        const drawRoot = (x) => {
+          ctx.beginPath(); ctx.moveTo(x, 0);
+          ctx.quadraticCurveTo(x - 20, 30, x - 40, 50); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x, 10);
+          ctx.quadraticCurveTo(x + 20, 30, x + 30, 50); ctx.stroke();
+        }
+        drawRoot(-20); drawRoot(20);
+        break
+
+      // --- TECH ---
+      case 'walker':
+        ctx.strokeStyle = '#666'; ctx.lineWidth = 8;
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-50, 30); ctx.lineTo(-40, 60); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(50, 30); ctx.lineTo(40, 60); ctx.stroke();
+        break
+      case 'treads':
+        ctx.fillStyle = '#333';
+        ctx.fillRect(-60, 0, 120, 40);
+        ctx.fillStyle = '#555';
+        for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.arc(-40 + i * 20, 35, 5, 0, Math.PI * 2); ctx.fill(); }
+        break
+      case 'jet':
+        ctx.fillStyle = '#999';
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-40, 30); ctx.lineTo(-20, 30); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(40, 30); ctx.lineTo(20, 30); ctx.fill();
+        // Fire
+        ctx.fillStyle = 'orange';
+        ctx.beginPath(); ctx.moveTo(-30, 30); ctx.lineTo(-40, 50); ctx.lineTo(-20, 50); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(30, 30); ctx.lineTo(40, 50); ctx.lineTo(20, 50); ctx.fill();
+        break
+      case 'antigrav':
+        ctx.fillStyle = '#222';
+        ctx.beginPath(); ctx.ellipse(0, 20, 40, 10, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowColor = 'cyan'; ctx.shadowBlur = 15;
+        ctx.fillStyle = '#0ff';
+        ctx.beginPath(); ctx.ellipse(0, 20, 30, 5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+        break
+      case 'mech':
+        ctx.fillStyle = '#444'; ctx.strokeStyle = '#888';
+        const drawMechLeg = (x) => {
+          ctx.fillRect(x - 10, 0, 20, 25); ctx.strokeRect(x - 10, 0, 20, 25);
+          ctx.fillRect(x - 15, 25, 30, 35); ctx.strokeRect(x - 15, 25, 30, 35);
+        }
+        drawMechLeg(-40); drawMechLeg(40);
+        break
+      case 'skates':
+        // Legs
+        ctx.lineWidth = 10;
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-30, 40); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(30, 40); ctx.stroke();
+        // Skates
+        ctx.fillStyle = '#fff'; ctx.fillRect(-40, 40, 20, 10); ctx.fillRect(20, 40, 20, 10);
+        // Wheels
+        ctx.fillStyle = 'cyan';
+        ctx.beginPath(); ctx.arc(-35, 55, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(-25, 55, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(25, 55, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(35, 55, 4, 0, Math.PI * 2); ctx.fill();
+        break
+
+      default:
+        // Left leg
+        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(-30, 20); ctx.stroke();
+        // Right leg
+        ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(30, 20); ctx.stroke();
     }
 
     ctx.restore()

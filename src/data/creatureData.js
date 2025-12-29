@@ -296,3 +296,53 @@ export const generateArmTypes = () => {
 }
 
 export const armTypes = generateArmTypes()
+
+export const generateLegTypes = () => {
+    const types = []
+
+    // 1. Basic Legs (Balanced)
+    const basicLegs = [
+        { id: 'leg_none', name: 'No Legs', type: 'none', stats: { speed: 0, strength: 0, defense: 0 } },
+        { id: 'leg_stumpy', name: 'Stumpy Legs', type: 'stumpy', stats: { speed: 1, strength: 1, defense: 0 } },
+        { id: 'leg_human', name: 'Human Legs', type: 'human', stats: { speed: 3, strength: 2, defense: 0 } },
+        { id: 'leg_stick', name: 'Stick Legs', type: 'stick', stats: { speed: 2, strength: 0, defense: 0 } },
+        { id: 'leg_fat', name: 'Chubby Legs', type: 'fat', stats: { speed: 1, strength: 2, defense: 1 } },
+    ]
+    types.push(...basicLegs)
+
+    // 2. Speed/Agility (Speed Focus)
+    const speedLegs = [
+        { id: 'leg_cat', name: 'Cat Paws', type: 'cat', stats: { speed: 6, strength: 2, defense: 0 } },
+        { id: 'leg_cheetah', name: 'Cheetah Legs', type: 'cheetah', stats: { speed: 8, strength: 3, defense: -1 } },
+        { id: 'leg_rabbit', name: 'Rabbit Feet', type: 'rabbit', stats: { speed: 7, strength: 1, defense: 0 } },
+        { id: 'leg_wheels', name: 'Wheels', type: 'wheels', stats: { speed: 9, strength: 0, defense: 1 } },
+        { id: 'leg_springs', name: 'Springs', type: 'springs', stats: { speed: 6, strength: 0, defense: -1 } },
+    ]
+    types.push(...speedLegs)
+
+    // 3. Monster/Nature (Various)
+    const monsterLegs = [
+        { id: 'leg_spider', name: 'Spider Legs', type: 'spider', stats: { speed: 5, strength: 2, defense: 1 } }, // Multi-leg logic needed?
+        { id: 'leg_tentacles', name: 'Tentacle Legs', type: 'tentacles', stats: { speed: 3, strength: 3, defense: 1 } },
+        { id: 'leg_slime', name: 'Slime Trail', type: 'slime', stats: { speed: 1, defense: 4, strength: 1 } },
+        { id: 'leg_hooves', name: 'Hooves', type: 'hooves', stats: { speed: 5, strength: 4, defense: 1 } },
+        { id: 'leg_clawed', name: 'Raptor Claws', type: 'clawed', stats: { speed: 6, strength: 5, defense: 0 } },
+        { id: 'leg_roots', name: 'Tree Roots', type: 'roots', stats: { speed: -2, defense: 6, strength: 3 } }
+    ]
+    types.push(...monsterLegs)
+
+    // 4. Tech/Utility (Tech)
+    const techLegs = [
+        { id: 'leg_robot', name: 'Tech Walkers', type: 'walker', stats: { speed: 3, defense: 4, strength: 4 } },
+        { id: 'leg_treads', name: 'Tank Treads', type: 'treads', stats: { speed: 2, defense: 7, strength: 5 } },
+        { id: 'leg_jet', name: 'Hover Jet', type: 'jet', stats: { speed: 8, defense: 1, strength: 1 } },
+        { id: 'leg_antigrav', name: 'Anti-Grav', type: 'antigrav', stats: { speed: 6, defense: 3, strength: 0 } },
+        { id: 'leg_mech', name: 'Mech Legs', type: 'mech', stats: { strength: 6, defense: 5, speed: 2 } },
+        { id: 'leg_skates', name: 'Roller Skates', type: 'skates', stats: { speed: 7, strength: 1, defense: 0 } }
+    ]
+    types.push(...techLegs)
+
+    return types
+}
+
+export const legTypes = generateLegTypes()
