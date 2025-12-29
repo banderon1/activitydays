@@ -16,6 +16,12 @@ function CreatureCanvas({ creature, size = 300 }) {
     ctx.save()
     ctx.scale(scale, scale)
 
+    // Draw back accessory (behind body)
+    if (creature.accessoryProps?.layer === 'back') {
+      console.log('Drawing Accessory (Back)...');
+      drawBackAccessory(ctx, creature)
+    }
+
     // Draw legs
     console.log('Scaling done. Drawing Legs...');
     drawLegs(ctx, creature)
@@ -28,12 +34,6 @@ function CreatureCanvas({ creature, size = 300 }) {
     console.log('Drawing Arms...');
     drawArms(ctx, creature)
 
-    // Draw accessory (behind face)
-    if (creature.accessory !== 'none' && creature.accessory !== 'crown') {
-      console.log('Drawing Accessory (Rear)...');
-      drawAccessory(ctx, creature)
-    }
-
     // Draw eyes
     console.log('Drawing Eyes...');
     drawEyes(ctx, creature)
@@ -42,10 +42,10 @@ function CreatureCanvas({ creature, size = 300 }) {
     console.log('Drawing Mouth...');
     drawMouth(ctx, creature)
 
-    // Draw crown (on top)
-    if (creature.accessory === 'crown') {
-      console.log('Drawing Accessory (Crown)...');
-      drawAccessory(ctx, creature)
+    // Draw front accessory (on top)
+    if (creature.accessoryProps?.layer === 'front') {
+      console.log('Drawing Accessory (Front)...');
+      drawFrontAccessory(ctx, creature)
     }
 
     ctx.restore()
@@ -865,88 +865,190 @@ function CreatureCanvas({ creature, size = 300 }) {
     ctx.restore()
   }
 
-  const drawAccessory = (ctx, creature) => {
+  const drawBackAccessory = (ctx, creature) => {
     ctx.save()
     ctx.translate(150, 150)
-    ctx.strokeStyle = '#333'
-    ctx.fillStyle = '#8B4513'
-    ctx.lineWidth = 3
+    const type = creature.accessoryProps?.type || 'none';
 
-    switch (creature.accessory) {
-      case 'horns':
-        // Left horn
-        ctx.fillStyle = '#8B4513'
-        ctx.beginPath()
-        ctx.moveTo(-40, -50)
-        ctx.lineTo(-30, -80)
-        ctx.lineTo(-20, -50)
-        ctx.fill()
-        ctx.stroke()
-        // Right horn
-        ctx.beginPath()
-        ctx.moveTo(40, -50)
-        ctx.lineTo(30, -80)
-        ctx.lineTo(20, -50)
-        ctx.fill()
-        ctx.stroke()
-        break
-      case 'antenna':
-        ctx.strokeStyle = '#333'
-        ctx.lineWidth = 2
-        // Left antenna
-        ctx.beginPath()
-        ctx.moveTo(-20, -60)
-        ctx.lineTo(-25, -85)
-        ctx.stroke()
-        ctx.fillStyle = '#ff00ff'
-        ctx.beginPath()
-        ctx.arc(-25, -85, 5, 0, Math.PI * 2)
-        ctx.fill()
-        // Right antenna
-        ctx.beginPath()
-        ctx.moveTo(20, -60)
-        ctx.lineTo(25, -85)
-        ctx.stroke()
-        ctx.beginPath()
-        ctx.arc(25, -85, 5, 0, Math.PI * 2)
-        ctx.fill()
-        break
-      case 'spikes':
-        ctx.fillStyle = '#666'
-        for (let i = -2; i <= 2; i++) {
-          ctx.beginPath()
-          ctx.moveTo(i * 20 - 8, -60)
-          ctx.lineTo(i * 20, -80)
-          ctx.lineTo(i * 20 + 8, -60)
-          ctx.fill()
-          ctx.stroke()
+    switch (type) {
+      // --- WINGS ---
+      case 'wings_bat':
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(80, -80, 140, -40);
+        ctx.quadraticCurveTo(100, 20, 0, 0); // Wing shape needs tweaking
+        // Left Wing
+        ctx.save(); ctx.scale(-1, 1);
+        ctx.beginPath(); ctx.moveTo(20, -20); ctx.quadraticCurveTo(80, -100, 150, -60);
+        ctx.quadraticCurveTo(120, 20, 60, 0); ctx.lineTo(20, -20); ctx.fill();
+        ctx.restore();
+        // Right Wing
+        ctx.beginPath(); ctx.moveTo(20, -20); ctx.quadraticCurveTo(80, -100, 150, -60);
+        ctx.quadraticCurveTo(120, 20, 60, 0); ctx.lineTo(20, -20); ctx.fill();
+        break;
+      case 'wings_angel':
+        ctx.fillStyle = '#fff'; ctx.strokeStyle = '#ddd'; ctx.lineWidth = 2;
+        const drawAngelWing = (x, s) => {
+          ctx.save(); ctx.scale(s, 1);
+          ctx.beginPath(); ctx.moveTo(x, -20);
+          ctx.quadraticCurveTo(x + 80, -80, x + 120, -40);
+          ctx.quadraticCurveTo(x + 100, 40, x + 20, 0);
+          ctx.fill(); ctx.stroke();
+          ctx.restore();
         }
-        break
+        drawAngelWing(20, 1);
+        drawAngelWing(20, -1);
+        break;
+      case 'cape':
+        ctx.fillStyle = '#d00';
+        ctx.beginPath();
+        ctx.moveTo(-40, -40);
+        ctx.lineTo(40, -40);
+        ctx.lineTo(60, 100);
+        ctx.quadraticCurveTo(0, 120, -60, 100);
+        ctx.fill();
+        break;
+      case 'jetpack':
+        ctx.fillStyle = '#ccc';
+        // Tanks
+        ctx.beginPath(); ctx.rect(-40, -60, 30, 80); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.rect(10, -60, 30, 80); ctx.fill(); ctx.stroke();
+        // Flames
+        ctx.fillStyle = 'orange';
+        ctx.beginPath(); ctx.moveTo(-25, 20); ctx.lineTo(-35, 50); ctx.lineTo(-15, 50); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(25, 20); ctx.lineTo(15, 50); ctx.lineTo(35, 50); ctx.fill();
+        break;
+      case 'spikes':
+        ctx.fillStyle = '#555';
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-60, -40 + i * 40); ctx.lineTo(-90, -20 + i * 40); ctx.lineTo(-60, 0 + i * 40); ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(60, -40 + i * 40); ctx.lineTo(90, -20 + i * 40); ctx.lineTo(60, 0 + i * 40); ctx.fill();
+        }
+        break;
+      case 'shell':
+        ctx.fillStyle = '#228B22'; ctx.strokeStyle = '#006400'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.ellipse(0, 0, 75, 85, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Pattern
+        ctx.beginPath(); ctx.moveTo(0, -85); ctx.lineTo(0, 85); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-75, 0); ctx.lineTo(75, 0); ctx.stroke();
+        break;
+      case 'backpack':
+        ctx.fillStyle = '#8B4513';
+        ctx.beginPath(); ctx.roundRect(-50, -50, 100, 100, 10); ctx.fill();
+        ctx.fillStyle = '#D2691E'; // Pocket
+        ctx.beginPath(); ctx.roundRect(-40, 0, 80, 40, 5); ctx.fill();
+        break;
+      case 'magic':
+        ctx.strokeStyle = 'cyan'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(0, 0, 90, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 0, 100, 0, Math.PI * 2); ctx.stroke();
+        // Runes/Glow
+        break;
+    }
+    ctx.restore()
+  }
+
+  const drawFrontAccessory = (ctx, creature) => {
+    ctx.save()
+    ctx.translate(150, 150)
+    const type = creature.accessoryProps?.type || 'none';
+
+    switch (type) {
+      // --- HEADGEAR ---
+      case 'tophat':
+        ctx.fillStyle = '#111';
+        ctx.fillRect(-40, -90, 80, 60); // Cylinder
+        ctx.fillRect(-60, -30, 120, 10); // Brim
+        ctx.fillStyle = '#f00'; ctx.fillRect(-40, -40, 80, 10); // Ribbon
+        break;
+      case 'cowboy':
+        ctx.fillStyle = '#8B4513';
+        ctx.beginPath(); ctx.ellipse(0, -40, 70, 20, 0, Math.PI, 0); ctx.fill(); // Brim top
+        ctx.beginPath(); ctx.ellipse(0, -40, 70, 20, 0, 0, Math.PI); ctx.fill(); // Brim bottom (visual)
+        ctx.fillRect(-40, -80, 80, 50); // Crown
+        break;
       case 'crown':
-        ctx.fillStyle = '#FFD700'
-        ctx.strokeStyle = '#DAA520'
-        ctx.beginPath()
-        ctx.moveTo(-40, -60)
-        // Points of crown
-        ctx.lineTo(-30, -80)
-        ctx.lineTo(-20, -65)
-        ctx.lineTo(-10, -80)
-        ctx.lineTo(0, -65)
-        ctx.lineTo(10, -80)
-        ctx.lineTo(20, -65)
-        ctx.lineTo(30, -80)
-        ctx.lineTo(40, -60)
-        ctx.lineTo(40, -50)
-        ctx.lineTo(-40, -50)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-        // Jewels
-        ctx.fillStyle = '#ff0000'
-        ctx.beginPath()
-        ctx.arc(0, -55, 4, 0, Math.PI * 2)
-        ctx.fill()
-        break
+        ctx.fillStyle = '#FFD700'; ctx.strokeStyle = '#DAA520';
+        ctx.beginPath(); ctx.moveTo(-40, -60);
+        ctx.lineTo(-30, -90); ctx.lineTo(-20, -70); ctx.lineTo(0, -95);
+        ctx.lineTo(20, -70); ctx.lineTo(30, -90); ctx.lineTo(40, -60);
+        ctx.lineTo(40, -50); ctx.lineTo(-40, -50); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        break;
+      case 'helmet':
+        ctx.fillStyle = '#ccc'; ctx.strokeStyle = '#555';
+        ctx.beginPath(); ctx.arc(0, -20, 65, Math.PI, 0); ctx.lineTo(65, 20); ctx.lineTo(0, 50); ctx.lineTo(-65, 20); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        // Slit
+        ctx.fillStyle = '#111'; ctx.fillRect(-40, -10, 80, 5);
+        break;
+      case 'horns':
+        ctx.fillStyle = '#ccc';
+        ctx.beginPath(); ctx.moveTo(-40, -50); ctx.quadraticCurveTo(-60, -80, -30, -90); ctx.lineTo(-20, -50); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(40, -50); ctx.quadraticCurveTo(60, -80, 30, -90); ctx.lineTo(20, -50); ctx.fill();
+        break;
+      case 'antenna':
+        ctx.strokeStyle = '#555'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, -60); ctx.lineTo(0, -100); ctx.stroke();
+        ctx.fillStyle = '#0f0'; ctx.beginPath(); ctx.arc(0, -100, 5, 0, Math.PI * 2); ctx.fill();
+        break;
+      case 'halo':
+        ctx.strokeStyle = 'yellow'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.ellipse(0, -90, 40, 10, 0, 0, Math.PI * 2); ctx.stroke();
+        break;
+      case 'flower':
+        ctx.fillStyle = 'pink';
+        ctx.beginPath(); ctx.arc(40, -60, 15, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(40, -60, 5, 0, Math.PI * 2); ctx.fill();
+        break;
+
+      // --- FACE ---
+      case 'glasses':
+        ctx.fillStyle = 'rgba(0,0,0,0.8)';
+        ctx.fillRect(-45, -10, 40, 20);
+        ctx.fillRect(5, -10, 40, 20);
+        ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(5, 0); ctx.stroke();
+        break;
+      case 'monocle':
+        ctx.strokeStyle = 'gold'; ctx.lineWidth = 2; ctx.fillStyle = 'rgba(200,250,255,0.3)';
+        ctx.beginPath(); ctx.arc(20, 0, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(35, 0); ctx.lineTo(35, 60); ctx.stroke(); // Chain
+        break;
+      case 'mask':
+        ctx.fillStyle = '#111';
+        ctx.beginPath(); ctx.moveTo(-50, -10); ctx.lineTo(50, -10); ctx.lineTo(40, 20); ctx.lineTo(0, 10); ctx.lineTo(-40, 20); ctx.fill();
+        // Eye holes
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath(); ctx.arc(-20, 0, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(20, 0, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+        break;
+      case 'mustache':
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.moveTo(0, 20);
+        ctx.quadraticCurveTo(15, 10, 30, 25); ctx.quadraticCurveTo(15, 20, 0, 20);
+        ctx.moveTo(0, 20);
+        ctx.quadraticCurveTo(-15, 10, -30, 25); ctx.quadraticCurveTo(-15, 20, 0, 20);
+        ctx.fill();
+        break;
+      case 'eyepatch':
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(-20, 0, 15, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(-30, -10); ctx.lineTo(40, -40); ctx.stroke();
+        break;
+      case 'flies':
+        ctx.fillStyle = '#000';
+        for (let i = 0; i < 5; i++) {
+          const x = Math.cos(Date.now() / 500 + i) * 50;
+          const y = Math.sin(Date.now() / 500 + i) * 50 - 50;
+          ctx.fillRect(x, y, 3, 3);
+        }
+        break;
     }
 
     ctx.restore()

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { bodyTypes, eyeTypes, colors, mouthTypes, armTypes, legTypes } from '../data/creatureData'
+import { bodyTypes, eyeTypes, colors, mouthTypes, armTypes, legTypes, accessoryTypes } from '../data/creatureData'
 import CreatureCanvas from './CreatureCanvas'
 import './CreatureBuilder.css'
 
@@ -9,7 +9,7 @@ import './CreatureBuilder.css'
 // const mouthTypes = [...] - Now imported
 // const armTypes = [...] - Now imported
 // const legTypes = [...] - Now imported
-const accessoryTypes = ['none', 'horns', 'antenna', 'spikes', 'crown']
+// const accessoryTypes = [...] - Now imported
 
 function CreatureBuilder({ onSave }) {
   console.log('CreatureBuilder legTypes:', legTypes);
@@ -23,7 +23,7 @@ function CreatureBuilder({ onSave }) {
     mouthType: mouthTypes[0].id,
     armType: armTypes[0].id,
     legType: safeLegType,
-    accessory: 'none',
+    accessory: accessoryTypes[0].id,
     // Base Stats
     strength: 5,
     speed: 5,
@@ -87,10 +87,13 @@ function CreatureBuilder({ onSave }) {
     }
 
     // Accessories provide bonuses
-    if (creature.accessory === 'horns') strength += 2
-    if (creature.accessory === 'spikes') defense += 2
-    if (creature.accessory === 'antenna') speed += 2
-    if (creature.accessory === 'crown') { strength += 1; defense += 1; speed += 1 }
+    const currentAccessory = accessoryTypes.find(a => a.id === creature.accessory)
+    if (currentAccessory) {
+      strength += currentAccessory.stats.strength || 0
+      speed += currentAccessory.stats.speed || 0
+      defense += currentAccessory.stats.defense || 0
+      // health handled in initialization usually but let's just stick to Str/Spd/Def for display
+    }
 
     setCreature(prev => ({
       ...prev,
@@ -144,7 +147,11 @@ function CreatureBuilder({ onSave }) {
       } : {},
       legProps: currentLeg ? {
         type: currentLeg.type
-      } : {}
+      } : {},
+      accessoryProps: {
+        type: (accessoryTypes.find(a => a.id === randomAccessory) || accessoryTypes[0]).type,
+        layer: (accessoryTypes.find(a => a.id === randomAccessory) || accessoryTypes[0]).layer
+      }
     })
 
     // Reset to create new creature
@@ -156,7 +163,7 @@ function CreatureBuilder({ onSave }) {
       mouthType: mouthTypes[0].id,
       armType: armTypes[0].id,
       legType: legTypes[0].id,
-      accessory: 'none',
+      accessory: accessoryTypes[0].id,
       strength: 5,
       speed: 5,
       defense: 5,
@@ -174,7 +181,7 @@ function CreatureBuilder({ onSave }) {
       mouthType: mouthTypes[Math.floor(Math.random() * mouthTypes.length)].id,
       armType: armTypes[Math.floor(Math.random() * armTypes.length)].id,
       legType: legTypes[Math.floor(Math.random() * legTypes.length)].id,
-      accessory: accessoryTypes[Math.floor(Math.random() * accessoryTypes.length)]
+      accessory: accessoryTypes[Math.floor(Math.random() * accessoryTypes.length)].id
     }))
   }
 
@@ -205,6 +212,10 @@ function CreatureBuilder({ onSave }) {
     },
     legProps: {
       type: (legTypes && legTypes.length > 0) ? (legTypes.find(l => l.id === creature.legType) || legTypes[0]).type : 'stumpy'
+    },
+    accessoryProps: {
+      type: (accessoryTypes.find(a => a.id === creature.accessory) || accessoryTypes[0]).type,
+      layer: (accessoryTypes.find(a => a.id === creature.accessory) || accessoryTypes[0]).layer
     }
   }
 
@@ -355,18 +366,18 @@ function CreatureBuilder({ onSave }) {
         </div>
 
         <div className="control-group">
-          <label>Accessory:</label>
-          <div className="button-group">
+          <label>Accessory ({accessoryTypes.length} Options):</label>
+          <select
+            value={creature.accessory}
+            onChange={(e) => updateCreature('accessory', e.target.value)}
+            className="body-selector"
+          >
             {accessoryTypes.map(type => (
-              <button
-                key={type}
-                className={creature.accessory === type ? 'selected' : ''}
-                onClick={() => updateCreature('accessory', type)}
-              >
-                {type}
-              </button>
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
         <div className="action-buttons">

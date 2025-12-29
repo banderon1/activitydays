@@ -346,3 +346,42 @@ export const generateLegTypes = () => {
 }
 
 export const legTypes = generateLegTypes()
+
+const generateAccessoryTypes = () => {
+    const types = [
+        { id: 'acc_none', name: 'None', type: 'none', layer: 'front', stats: { speed: 0, strength: 0, defense: 0, health: 0 } },
+
+        // --- HEADGEAR (Front/Top) ---
+        { id: 'acc_hat_top', name: 'Top Hat', type: 'tophat', layer: 'front', stats: { speed: 0, strength: 0, defense: 0, health: 0 } },
+        { id: 'acc_hat_cowboy', name: 'Cowboy Hat', type: 'cowboy', layer: 'front', stats: { speed: 1, strength: 0, defense: 0, health: 0 } },
+        { id: 'acc_crown', name: 'Royal Crown', type: 'crown', layer: 'front', stats: { speed: 0, strength: 2, defense: 2, health: 0 } },
+        { id: 'acc_helmet', name: 'Knight Helmet', type: 'helmet', layer: 'front', stats: { speed: -1, strength: 0, defense: 5, health: 0 } },
+        { id: 'acc_horns', name: 'Demon Horns', type: 'horns', layer: 'front', stats: { speed: 0, strength: 3, defense: 0, health: 0 } },
+        { id: 'acc_antenna', name: 'Alien Antenna', type: 'antenna', layer: 'front', stats: { speed: 2, strength: 0, defense: 0, health: 0 } },
+        { id: 'acc_halo', name: 'Angel Halo', type: 'halo', layer: 'front', stats: { speed: 0, strength: 0, defense: 1, health: 5 } },
+        { id: 'acc_flower', name: 'Flower', type: 'flower', layer: 'front', stats: { speed: 0, strength: 0, defense: 0, health: 2 } },
+
+        // --- FACE (Front) ---
+        { id: 'acc_glasses', name: 'Sunglasses', type: 'glasses', layer: 'front', stats: { speed: 1, strength: 0, defense: 0, health: 0 } },
+        { id: 'acc_monocle', name: 'Monocle', type: 'monocle', layer: 'front', stats: { speed: 0, strength: 0, defense: 0, health: 0 } },
+        { id: 'acc_mask', name: 'Hero Mask', type: 'mask', layer: 'front', stats: { speed: 0, strength: 0, defense: 2, health: 0 } },
+        { id: 'acc_mustache', name: 'Mustache', type: 'mustache', layer: 'front', stats: { speed: 0, strength: 1, defense: 0, health: 0 } },
+        { id: 'acc_patch', name: 'Eye Patch', type: 'eyepatch', layer: 'front', stats: { speed: 0, strength: 2, defense: 0, health: 0 } },
+
+        // --- BACK (Back) ---
+        { id: 'acc_wings_bat', name: 'Bat Wings', type: 'wings_bat', layer: 'back', stats: { speed: 3, strength: 0, defense: 0, health: 0 } },
+        { id: 'acc_wings_angel', name: 'Angel Wings', type: 'wings_angel', layer: 'back', stats: { speed: 2, strength: 0, defense: 1, health: 0 } },
+        { id: 'acc_cape', name: 'Hero Cape', type: 'cape', layer: 'back', stats: { speed: 1, strength: 0, defense: 1, health: 0 } },
+        { id: 'acc_jetpack', name: 'Jetpack', type: 'jetpack', layer: 'back', stats: { speed: 5, strength: 0, defense: 1, health: 0 } },
+        { id: 'acc_spikes', name: 'Back Spikes', type: 'spikes', layer: 'back', stats: { speed: 0, strength: 0, defense: 4, health: 0 } },
+        { id: 'acc_shell', name: 'Turtle Shell', type: 'shell', layer: 'back', stats: { speed: -2, strength: 0, defense: 8, health: 0 } },
+        { id: 'acc_backpack', name: 'Backpack', type: 'backpack', layer: 'back', stats: { speed: -1, strength: 0, defense: 0, health: 5 } },
+
+        // --- FLOATING (Front/All) ---
+        { id: 'acc_flies', name: 'Swarm of Flies', type: 'flies', layer: 'front', stats: { speed: 0, strength: 0, defense: -1, health: -2 } },
+        { id: 'acc_magic', name: 'Magic Aura', type: 'magic', layer: 'back', stats: { speed: 1, strength: 2, defense: 1, health: 0 } },
+    ]
+    return types
+}
+
+export const accessoryTypes = generateAccessoryTypes()
